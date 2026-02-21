@@ -1,0 +1,82 @@
+# Starship 設定ファイル
+# tilix 対応の軽量設定
+
+# プロンプトの全体設定
+format = """
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_status\
+$nodejs\
+$python\
+$rust\
+$golang\
+$cmd_duration\
+$line_break\
+$character"""
+
+# ユーザー名表示
+[username]
+style_user = "cyan bold"
+style_root = "red bold"
+format = "[$user]($style)"
+disabled = false
+show_always = true
+
+# ホスト名表示
+[hostname]
+ssh_only = false
+format = "@[$hostname](blue bold)"
+disabled = false
+
+# ディレクトリ表示
+[directory]
+style = "blue bold"
+truncation_length = 3
+truncate_to_repo = true
+
+# Git ブランチ
+[git_branch]
+symbol = "🌱 "
+style = "green bold"
+
+# Git ステータス
+[git_status]
+style = "red bold"
+ahead = "⇡${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+behind = "⇣${count}"
+
+# Node.js
+[nodejs]
+symbol = "⬢ "
+style = "green bold"
+
+# Python
+[python]
+symbol = "🐍 "
+style = "yellow bold"
+
+# Rust
+[rust]
+symbol = "🦀 "
+style = "red bold"
+
+# Go
+[golang]
+symbol = "🐹 "
+style = "cyan bold"
+
+# コマンド実行時間
+[cmd_duration]
+min_time = 2_000
+style = "yellow bold"
+format = "took [$duration]($style)"
+
+# プロンプト文字
+[character]
+success_symbol = "[❯](green bold)"
+error_symbol = "[❯](red bold)"
+
+

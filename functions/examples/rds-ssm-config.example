@@ -1,0 +1,281 @@
+# RDS-SSM接続ツール設定例
+
+## AWS設定例
+
+### ~/.aws/config
+```ini
+[default]
+region = ap-northeast-1
+output = json
+
+[profile dev]
+region = ap-northeast-1
+output = json
+
+[profile prod]
+region = ap-northeast-1
+output = json
+```
+
+# 推奨: IAM Identity Center(SSO) の例（~/.aws/config）
+# aws configure sso で自動生成される内容の参考
+# [profile dev]
+# sso_session = my-sso
+# sso_account_id = 111122223333
+# sso_role_name  = Developer
+# region = ap-northeast-1
+#
+# [sso-session my-sso]
+# sso_region     = ap-northeast-1
+# sso_start_url  = https://example.awsapps.com/start
+
+### ~/.aws/credentials (非推奨: 長期キーより一時認証/SSOを推奨)
+```ini
+# 注意: 長期アクセスキーは非推奨です
+# 代わりに以下を実行してください:
+# aws configure sso
+# または credential_process/aws-vault を使用
+
+# [default]
+# aws_access_key_id = YOUR_ACCESS_KEY_ID
+# aws_secret_access_key = YOUR_SECRET_ACCESS_KEY
+```
+
+## IAMポリシー例
+
+### EC2用IAMロール (SSM接続用)
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:UpdateInstanceInformation",
+        "ssm:SendCommand",
+        "ssm:ListCommands",
+        "ssm:ListCommandInvocations",
+        "ssm:DescribeInstanceInformation",
+        "ssm:GetDeployablePatchSnapshotForInstance",
+        "ssm:GetDefaultPatchBaseline",
+        "ssm:GetManifest",
+        "ssm:GetParameters",
+        "ssm:ListAssociations",
+        "ssm:ListInstanceAssociations",
+        "ssm:PutInventory",
+        "ssm:PutComplianceItems",
+        "ssm:PutConfigurePackageResult",
+        "ssm:UpdateAssociationStatus",
+        "ssm:UpdateInstanceAssociationStatus",
+        "ssm:UpdateInstanceInformation"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssmmessages:CreateControlChannel",
+        "ssmmessages:CreateDataChannel",
+        "ssmmessages:OpenControlChannel",
+        "ssmmessages:OpenDataChannel"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2messages:AcknowledgeMessage",
+        "ec2messages:DeleteMessage",
+        "ec2messages:FailMessage",
+        "ec2messages:GetEndpoint",
+        "ec2messages:GetMessages",
+        "ec2messages:SendReply"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+### RDS-SSM接続用IAMユーザー/ロール
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:StartSession",
+        "ssm:ResumeSession",
+        "ssm:TerminateSession"
+      ],
+      "Resource": [
+        "arn:aws:ec2:*:*:instance/*",
+        "arn:aws:ssm:*:*:document/AWS-StartPortForwardingSessionToRemoteHost"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:DescribeInstanceInformation"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeInstances"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "rds:DescribeDBInstances"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "rds-db:connect"
+      ],
+      "Resource": [
+        "arn:aws:rds-db:*:*:dbuser:DBI_RESOURCE_ID/your-db-username"
+      ]
+    }
+  ]
+}
+```
+
+## RDS設定例
+
+### MySQL用IAM認証設定
+```sql
+-- IAM認証用ユーザー作成 (RDS管理者権限で実行)
+CREATE USER 'iam-user'@'%' IDENTIFIED WITH AWSAuthenticationPlugin AS 'RDS';
+GRANT SELECT, INSERT, UPDATE, DELETE ON your_database.* TO 'iam-user'@'%';
+FLUSH PRIVILEGES;
+```
+
+### PostgreSQL用IAM認証設定
+```sql
+-- IAM認証用ユーザー作成 (RDS管理者権限で実行)
+CREATE USER "iam-user";
+GRANT rds_iam TO "iam-user";
+GRANT CONNECT ON DATABASE your_database TO "iam-user";
+GRANT USAGE ON SCHEMA public TO "iam-user";
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO "iam-user";
+```
+
+## セキュリティグループ設定例
+
+### EC2セキュリティグループ
+```
+インバウンドルール:
+- SSM-only運用の場合: なし（SSMはアウトバウンド443のみで動作）
+- SSH必要な場合: SSH (22): 管理者用CIDR（例: 10.0.0.0/8, 192.168.1.0/24）
+  ⚠️ 0.0.0.0/0 は避けてください
+
+アウトバウンドルール:
+- HTTPS (443): 0.0.0.0/0 (SSM通信用)
+- その他必要に応じて
+```
+
+### RDSセキュリティグループ
+```
+インバウンドルール:
+- MySQL/Aurora (3306): EC2セキュリティグループID
+- PostgreSQL (5432): EC2セキュリティグループID
+
+アウトバウンドルール:
+- 設定不要 (デフォルト)
+```
+
+## 使用例
+
+### 基本的な使用フロー
+```bash
+# 1. 関数実行
+rds-ssm
+
+# 2. AWS Profileを選択 (例: prod)
+# 3. EC2インスタンスを選択 (例: bastion-host)
+# 4. RDSインスタンスを選択 (例: production-mysql)
+# 5. 接続情報入力
+#    データベース名: myapp
+#    ユーザー名: app_user
+#    ローカルポート: 13306 (デフォルト)
+# 6. 認証方式 (自動判定)
+#    - IAM認証: トークン自動生成
+#    - パスワード認証: パスワード入力
+# 7. SSMポートフォワーディング開始
+# 8. データベース接続
+```
+
+### 手動接続コマンド例
+```bash
+# MySQL (IAM認証; TLS/プラグイン必須)
+mysql --host=localhost --port=13306 --user=iam-user --database=myapp \
+  --ssl-ca=global-bundle.pem --enable-cleartext-plugin --password="GENERATED_TOKEN"
+
+# MySQL (パスワード認証)
+mysql --host=localhost --port=13306 --user=app_user --database=myapp --password
+
+# PostgreSQL (IAM認証; TLS必須)
+PGPASSWORD="GENERATED_TOKEN" psql "host=localhost port=15432 dbname=myapp user=iam-user sslmode=verify-full sslrootcert=global-bundle.pem"
+
+# PostgreSQL (パスワード認証)
+PGPASSWORD="your_password" psql --host=localhost --port=15432 --username=app_user --dbname=myapp
+```
+
+## トラブルシューティング
+
+### よくある問題
+
+#### SSM接続失敗
+```bash
+# EC2インスタンスのSSM Agent状況確認
+aws ssm describe-instance-information --filters "Key=InstanceIds,Values=i-xxxxxxxxx"
+
+# SSM Agent再起動 (EC2内で実行)
+sudo systemctl restart snap.amazon-ssm-agent.amazon-ssm-agent.service
+```
+
+#### ポートフォワーディング失敗
+```bash
+# 既存のポートフォワーディング確認
+lsof -ti:13306
+
+# プロセス終了
+kill -9 $(lsof -ti:13306)
+```
+
+#### IAM認証失敗
+```bash
+# IAM認証権限確認
+aws rds generate-db-auth-token --hostname your-rds-endpoint --port 3306 --username iam-user
+
+# データベースユーザー確認
+SELECT user, host, plugin FROM mysql.user WHERE user = 'iam-user';
+```
+
+### デバッグモード
+```bash
+# AWS CLI デバッグ
+export AWS_CLI_DEBUG=1
+rds-ssm
+
+# SSMログ確認
+tail -f /tmp/rds-ssm-session.log
+```
+
+## セキュリティベストプラクティス
+
+1. **最小権限の原則**: 必要最小限のIAM権限のみ付与
+2. **ネットワーク分離**: プライベートサブネットにRDS配置
+3. **暗号化**: 保存時・転送時暗号化の有効化
+4. **アクセスログ**: CloudTrailとRDSログの有効化
+5. **定期的な権限見直し**: アクセス権限の定期監査
+6. **IAM認証推奨**: パスワード認証よりIAM認証を優先
+7. **セッション管理**: 不要なSSMセッションの定期終了
