@@ -10,9 +10,9 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# Determine dotfiles directory (resolves symlinks)
-export ZSH_CONFIG_DIR="${${(%):-%N}:A:h}"
-export DOTFILES_DIR="${DOTFILES_DIR:-${ZSH_CONFIG_DIR:h}}"
+# Determine dotfiles root directory (resolves symlinks)
+export DOTFILES_SHELL_ROOT="${${(%):-%N}:A:h:h}" # resolves to components/
+export ZSH_CONFIG_DIR="${DOTFILES_SHELL_ROOT}/dotfiles-zsh"
 
 # Load environment variables and secrets
 [[ -f "$ZSH_CONFIG_DIR/.zsh_env" ]] && source "$ZSH_CONFIG_DIR/.zsh_env"
@@ -284,20 +284,10 @@ alias kgnome='killall -3 gnome-shell'
 [[ -f "$ZSH_CONFIG_DIR/config.zsh" ]] && source "$ZSH_CONFIG_DIR/config.zsh"
 
 # 互換性と環境変数のための最終調整
-if [[ -z "$DOTFILES_DIR" || ! -d "$DOTFILES_DIR/zsh" ]]; then
-    if (( ${+CANDIDATE_DIRS} )); then
-        for candidate in "${CANDIDATE_DIRS[@]}"; do
-            if [[ -d "$candidate/zsh" ]]; then
-                export DOTFILES_DIR="$candidate"
-                break
-            fi
-        done
-    fi
-fi
-DOTFILES_DIR="${DOTFILES_OVERRIDE:-${DOTFILES_ROOT:-${DOTFILES_DIR}}}"
+export DOTFILES_DIR="${DOTFILES_OVERRIDE:-${DOTFILES_ROOT:-${DOTFILES_SHELL_ROOT}}}"
 
 # config.zsh の設定を反映（未定義時のデフォルト値設定）
-typeset functions_subdir="${FUNCTIONS_SUBDIR:-"zsh/functions"}"
+typeset functions_subdir="${FUNCTIONS_SUBDIR:-"functions"}"
 typeset functions_pattern="${FUNCTIONS_PATTERN:-"**/*.zsh"}"
 typeset debug_functions="${FUNCTIONS_DEBUG:-${ZSH_FUNCTIONS_DEBUG:-false}}"
 
@@ -306,10 +296,10 @@ if [[ "$debug_functions" == "true" ]]; then
     echo "🔍 関数ディレクトリ存在確認: $DOTFILES_DIR/$functions_subdir"
 fi
 
-if [[ -d "$DOTFILES_DIR/$functions_subdir" ]]; then
+if [[ -d "$ZSH_CONFIG_DIR/$functions_subdir" ]]; then
     # パフォーマンス最適化: glob結果を配列に格納してから処理
     typeset -a func_files
-    func_files=("$DOTFILES_DIR/$functions_subdir"/${~functions_pattern}(N))
+    func_files=("$ZSH_CONFIG_DIR/$functions_subdir"/${~functions_pattern}(N))
 
     # サブディレクトリを含む全てのzshファイルを再帰的に読み込み
     for func_file in "${func_files[@]}"; do
@@ -343,20 +333,20 @@ if [[ -d "$DOTFILES_DIR/$functions_subdir" ]]; then
             } >&2
         fi
     done
-    [[ "$debug_functions" == "true" ]] && echo "✅ 関数読み込み完了: $DOTFILES_DIR/$functions_subdir (${#func_files[@]} files)"
+    [[ "$debug_functions" == "true" ]] && echo "✅ 関数読み込み完了: $ZSH_CONFIG_DIR/$functions_subdir (${#func_files[@]} files)"
 else
     # 関数ディレクトリが見つからない場合の警告
     {
         echo "⚠️  zsh関数ディレクトリが見つかりません"
-        echo "   検出したDOTFILES_DIR: ${DOTFILES_DIR:-'(未検出)'}"
+        echo "   検出したDOTFILES_SHELL_ROOT: ${DOTFILES_SHELL_ROOT:-'(未検出)'}"
         echo "   期待ディレクトリ: \$DOTFILES_DIR/$functions_subdir"
         echo "   設定方法: zsh/config.zsh で修正するか export DOTFILES_DIR を設定"
     } >&2
 fi
 
 # Add lazygit bin to PATH if available
-if [[ -n "$DOTFILES_DIR" ]] && [[ -d "$DOTFILES_DIR/lazygit/bin" ]]; then
-    export PATH="$DOTFILES_DIR/lazygit/bin:$PATH"
+if [[ -n "$DOTFILES_SHELL_ROOT" ]] && [[ -d "$DOTFILES_SHELL_ROOT/dotfiles-git/bin" ]]; then
+    export PATH="$DOTFILES_SHELL_ROOT/dotfiles-git/bin:$PATH"
 fi
 
 # Fig post block. Keep at the bottom of this file.

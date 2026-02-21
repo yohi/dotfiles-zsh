@@ -74,6 +74,7 @@ type ec2-ssm
 ### AWS EC2 Functions
 
 #### `ec2-list`
+
 List all EC2 instances in your account
 
 ```bash
@@ -81,6 +82,7 @@ ec2-list
 ```
 
 #### `ec2-ssm`
+
 Connect to EC2 instance via SSM (no SSH key needed)
 
 ```bash
@@ -91,6 +93,7 @@ ec2-ssm
 ```
 
 **Requirements:**
+
 - SSM Agent running on EC2
 - IAM permissions for SSM
 - Session Manager Plugin installed
@@ -98,6 +101,7 @@ ec2-ssm
 ### AWS RDS Functions
 
 #### `rds-ssm`
+
 Connect to RDS via EC2 bastion using SSM port forwarding
 
 ```bash
@@ -115,6 +119,7 @@ rds-ssm --help
 ```
 
 **Features:**
+
 - Automatic security group connectivity check
 - Smart secret detection from AWS Secrets Manager
 - Automatic port forwarding via SSM
@@ -123,6 +128,7 @@ rds-ssm --help
 ### CloudWatch Logs
 
 #### `awslogs`
+
 Stream CloudWatch Logs in real-time
 
 ```bash
@@ -137,6 +143,7 @@ awslogs --verbose
 ### ECS Functions
 
 #### `ecs-list`
+
 List all ECS clusters
 
 ```bash
@@ -146,6 +153,7 @@ ecs-list
 ### Help
 
 #### `aws-help`
+
 Display comprehensive help for all AWS functions
 
 ```bash
@@ -182,13 +190,13 @@ export AWS_DEFAULT_REGION=us-east-1
 export DISABLE_CLAUDE_CODE_HISTORY=1
 ```
 
-### Custom DOTFILES_DIR
+### Custom DOTFILES_SHELL_ROOT
 
 If your dotfiles are in a non-standard location:
 
 ```bash
 # In config.zsh
-DOTFILES_DIR="/path/to/your/dotfiles"
+DOTFILES_SHELL_ROOT="/path/to/your/dotfiles"
 ```
 
 ---
@@ -202,11 +210,11 @@ DOTFILES_DIR="/path/to/your/dotfiles"
 export ZSH_FUNCTIONS_DEBUG=true
 source ~/.zshrc
 
-# Check DOTFILES_DIR detection
-echo $DOTFILES_DIR
+# Check DOTFILES_SHELL_ROOT detection
+echo $DOTFILES_SHELL_ROOT
 
-# Manually set DOTFILES_DIR
-export DOTFILES_DIR=/path/to/dots
+# Manually set DOTFILES_SHELL_ROOT
+export DOTFILES_SHELL_ROOT=/path/to/dots
 source ~/.zshrc
 ```
 
@@ -330,6 +338,7 @@ aws configure set mfa_serial arn:aws:iam::ACCOUNT:mfa/USER --profile work
 ### 3. Use SSM Instead of SSH
 
 Benefits:
+
 - No SSH key management
 - No open ports (uses HTTPS)
 - Full audit trail in CloudTrail
@@ -374,7 +383,7 @@ source ~/.zshrc
 ### Common Issues
 
 1. **"command not found: ec2-ssm"**
-   - Check DOTFILES_DIR detection
+   - Check DOTFILES_SHELL_ROOT detection
    - Verify functions directory exists
    - Enable debug mode
 

@@ -1,0 +1,10 @@
+Makefile
+QUICKSTART.md
+README.md
+LICENSE
+config
+functions
+prompts
+starship
+tests
+.git
