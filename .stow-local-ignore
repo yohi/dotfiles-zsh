@@ -11,3 +11,4 @@
 ^starship$
 ^tests$
 ^\.gitignore$
+^_mk$
