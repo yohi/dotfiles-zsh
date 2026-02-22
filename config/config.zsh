@@ -3,9 +3,9 @@
 # ===================================================================
 # このファイルで zsh 関数読み込みのパスや設定をカスタマイズできます
 
-# DOTFILES_DIR のカスタム設定
+# DOTFILES_SHELL_ROOT のカスタム設定
 # 環境変数で指定されていない場合、この値が使用されます
-#DOTFILES_DIR="$HOME/dotfiles"
+#DOTFILES_SHELL_ROOT="$HOME/dotfiles"
 
 # 関数読み込みの設定
 FUNCTIONS_SUBDIR="functions"           # 関数ディレクトリのサブパス
