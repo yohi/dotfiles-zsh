@@ -45,14 +45,20 @@ mkdirdatetime() {
 }
 
 # ls で ディレクトリに色を付ける
-autoload -U compinit
-compinit -u
+autoload -Uz compinit
+# Fix insecure directories in $fpath
+if [[ -n "$(compaudit 2>/dev/null)" ]]; then
+    compaudit 2>/dev/null | xargs -r chmod g-w,o-w
+fi
+compinit
 
 # DELETE KEY 有効化
 bindkey "^[[3~" delete-char
 #
 # HOMEBREW
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+if [[ -x "/home/linuxbrew/.linuxbrew/bin/brew" ]]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
 
 #     echo '# Set PATH, MANPATH, etc., for Homebrew.' >> /home/y_ohi/.zprofile
 #     echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/y_ohi/.zprofile
@@ -252,9 +258,11 @@ if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
         print -P "%F{160} The clone has failed.%f%b"
 fi
 
-source "$HOME/.local/share/zinit/zinit.git/zinit.zsh"
-autoload -Uz _zinit
-(( ${+_comps} )) && _comps[zinit]=_zinit
+if [[ -f "$HOME/.local/share/zinit/zinit.git/zinit.zsh" ]]; then
+    source "$HOME/.local/share/zinit/zinit.git/zinit.zsh"
+    autoload -Uz _zinit
+    (( ${+_comps} )) && _comps[zinit]=_zinit
+fi
 
 # Load a few important annexes, without Turbo
 # (this is currently required for annexes)
