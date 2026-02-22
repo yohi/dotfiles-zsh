@@ -15,8 +15,8 @@ export DOTFILES_SHELL_ROOT="${${(%):-%N}:A:h:h}" # resolves to components/
 export ZSH_CONFIG_DIR="${DOTFILES_SHELL_ROOT}/dotfiles-zsh"
 
 # Load environment variables and secrets
-[[ -f "$ZSH_CONFIG_DIR/.zsh_env" ]] && source "$ZSH_CONFIG_DIR/.zsh_env"
-[[ -f "$ZSH_CONFIG_DIR/.zsh_secrets" ]] && source "$ZSH_CONFIG_DIR/.zsh_secrets"
+[[ -f "$ZSH_CONFIG_DIR/dot-zsh_env" ]] && source "$ZSH_CONFIG_DIR/dot-zsh_env"
+[[ -f "$ZSH_CONFIG_DIR/dot-zsh_secrets" ]] && source "$ZSH_CONFIG_DIR/dot-zsh_secrets"
 
 # Claude Code オプトアウト環境変数
 export DISABLE_TELEMETRY=1
@@ -344,9 +344,12 @@ else
     } >&2
 fi
 
-# Add lazygit bin to PATH if available
-if [[ -n "$DOTFILES_SHELL_ROOT" ]] && [[ -d "$DOTFILES_SHELL_ROOT/dotfiles-git/bin" ]]; then
-    export PATH="$DOTFILES_SHELL_ROOT/dotfiles-git/bin:$PATH"
+# Add dotfiles component bin directories to PATH dynamically
+if [[ -n "$DOTFILES_SHELL_ROOT" ]]; then
+    # Use zsh globbing to find all _bin directories under components
+    for bin_dir in "$DOTFILES_SHELL_ROOT"/**/_bin(N/); do
+        export PATH="$bin_dir:$PATH"
+    done
 fi
 
 # Fig post block. Keep at the bottom of this file.
