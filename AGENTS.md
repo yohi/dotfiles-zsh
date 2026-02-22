@@ -47,7 +47,7 @@ GNU Stow creates symlinks from this repo's root into `~/`.
 
 ```makefile
 .DEFAULT_GOAL := setup
-# include mk/<feature>.mk    # if using mk/ subdirectory
+# include _mk/<feature>.mk    # if using _mk/ subdirectory
 
 .PHONY: setup
 setup:
