@@ -83,7 +83,7 @@ aws_config_ok=true
 
 # AWSプロファイル確認
 if aws configure list-profiles >/dev/null 2>&1; then
-    profiles=($(aws configure list-profiles))
+    mapfile -t profiles < <(aws configure list-profiles)
     if [ ${#profiles[@]} -gt 0 ]; then
         check_result 0 "AWS プロファイル設定 (${#profiles[@]}個のプロファイル)"
         echo "   利用可能なプロファイル: ${profiles[*]}"

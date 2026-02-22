@@ -216,7 +216,9 @@ if command -v nodenv 1>/dev/null 2>&1; then
 fi
 
 # direnv hook
-eval "$(direnv hook zsh)"
+if command -v direnv >/dev/null 2>&1; then
+  eval "$(direnv hook zsh)"
+fi
 
 
 
