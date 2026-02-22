@@ -127,7 +127,7 @@ if type rds-ssm >/dev/null 2>&1; then
 else
     check_result 1 "rds-ssm関数が読み込まれていません"
     echo "💡 zshを再起動するか、以下を実行してください:"
-    echo "   source ~/.dotfiles/zsh/functions/rds-ssm.zsh"
+    echo "   source functions/aws.zsh"
 fi
 
 echo

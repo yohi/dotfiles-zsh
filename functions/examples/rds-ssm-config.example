@@ -51,7 +51,6 @@ output = json
     {
       "Effect": "Allow",
       "Action": [
-        "ssm:UpdateInstanceInformation",
         "ssm:SendCommand",
         "ssm:ListCommands",
         "ssm:ListCommandInvocations",
@@ -262,9 +261,8 @@ SELECT user, host, plugin FROM mysql.user WHERE user = 'iam-user';
 
 ### デバッグモード
 ```bash
-# AWS CLI デバッグ
-export AWS_CLI_DEBUG=1
-rds-ssm
+# AWS CLI デバッグ (--debug フラグを使用)
+rds-ssm --debug
 
 # SSMログ確認
 tail -f /tmp/rds-ssm-session.log

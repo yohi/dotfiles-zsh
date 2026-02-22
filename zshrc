@@ -32,8 +32,17 @@ alias du="du -h"
 alias df="df -h"
 alias ld="lazydocker"
 alias lg="lazygit"
-alias mkdirdate="mkdir $(date +"%Y%m%d") && cd $(date +"%Y%m%d")"
-alias mkdirdatetime="mkdir $(date +"%Y%m%d%I%M%S")"
+
+# ディレクトリ作成と移動
+mkdirdate() {
+    local d=$(date +"%Y%m%d")
+    mkdir -p "$d" && cd "$d"
+}
+
+mkdirdatetime() {
+    local d=$(date +"%Y%m%d%H%M%S")
+    mkdir -p "$d" && cd "$d"
+}
 
 # ls で ディレクトリに色を付ける
 autoload -U compinit
@@ -253,7 +262,7 @@ zinit light-mode for \
     zdharma-continuum/zinit-annex-patch-dl \
     zdharma-continuum/zinit-annex-rust
 
-zinit light zdharma/fast-syntax-highlighting
+zinit light zdharma-continuum/fast-syntax-highlighting
 # zinit light zdharma/history-search-multi-word  # Disabled due to conflict with peco
 zinit light zsh-users/zsh-autosuggestions
 zinit light junegunn/fzf-bin

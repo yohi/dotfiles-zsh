@@ -97,6 +97,7 @@ rds-ssm() {
     echo
 
     if ! _aws_select_profile; then return 1; fi
+    profile="$AWS_PROFILE"
     if ! _aws_select_ec2_instance "$profile"; then return 1; fi
 
     if ! _rds_ssm_select_rds_instance "$search_all_regions" "$connectable_only"; then echo "❌ RDSインスタンス選択に失敗しました"; return 1; fi

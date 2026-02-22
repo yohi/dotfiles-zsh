@@ -33,8 +33,8 @@ APIキーやプライベートなトークンなど、リポジトリにコミ�
 初回利用時は、テンプレートから設定ファイルを作成してください。
 
 ```bash
-cp zsh/config.example.zsh zsh/config.zsh
-touch zsh/.zsh_secrets
+cp config/config.example.zsh config/config.zsh
+touch .zsh_secrets
 ```
 
 ## カスタマイズ

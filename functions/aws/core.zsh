@@ -58,7 +58,7 @@ _aws_select_profile() {
         return 1
     fi
 
-    profile=$(echo "$selected_line" | awk '{print $1}')
+    local profile=$(echo "$selected_line" | awk '{print $1}')
     export AWS_PROFILE="$profile"
 
     echo "✅ プロファイル '$profile' を選択しました。"
@@ -98,7 +98,7 @@ _aws_select_ec2_instance() {
     fi
 
     # 選択されたインスタンス情報を解析
-    instance_id=$(echo "$selected_instance_line" | awk '{print $1}')
+    local instance_id=$(echo "$selected_instance_line" | awk '{print $1}')
     export EC2_INSTANCE_NAME=$(echo "$selected_instance_line" | awk '{print $2}')
     export EC2_PRIVATE_IP=$(echo "$selected_instance_line" | awk '{print $3}')
     export EC2_VPC_ID=$(echo "$selected_instance_line" | awk '{print $4}')

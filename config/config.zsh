@@ -34,7 +34,20 @@ CANDIDATE_DIRS=(
 
 # SkillPort 設定
 # ドットファイルのベースディレクトリを特定
-_resolved_dotfiles_base="${DOTFILES_SHELL_ROOT:-$HOME/dotfiles}"
+_resolved_dotfiles_base=""
+if [[ -n "$DOTFILES_SHELL_ROOT" ]]; then
+    _resolved_dotfiles_base="$DOTFILES_SHELL_ROOT"
+else
+    # CANDIDATE_DIRS を優先順に確認
+    for dir in "${CANDIDATE_DIRS[@]}"; do
+        if [[ -d "$dir" ]]; then
+            _resolved_dotfiles_base="$dir"
+            break
+        fi
+    done
+    # 見つからない場合はデフォルトにフォールバック
+    _resolved_dotfiles_base="${_resolved_dotfiles_base:-$HOME/dotfiles}"
+fi
 
 export SKILLPORT_SKILLS_PATH="$_resolved_dotfiles_base/agent-skills"
 alias sp="skillport"

@@ -11,7 +11,7 @@
 
 ---
 
-## 🔧 Installation
+## Installation
 
 ### Prerequisites
 
@@ -38,7 +38,7 @@ exec zsh
 
 ---
 
-## 🎯 First Time Setup
+## First Time Setup
 
 ### 1. Configure AWS CLI (if using AWS functions)
 
@@ -69,7 +69,7 @@ type ec2-ssm
 
 ---
 
-## 📚 Available Functions
+## Available Functions
 
 ### AWS EC2 Functions
 
@@ -162,7 +162,7 @@ aws-help
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 ### Custom Configuration
 
@@ -201,7 +201,7 @@ DOTFILES_SHELL_ROOT="/path/to/your/dotfiles"
 
 ---
 
-## 🔍 Troubleshooting
+## Troubleshooting
 
 ### Functions Not Loading
 
@@ -276,7 +276,7 @@ source ~/.zshrc
 
 ---
 
-## ⚡ Performance Tips
+## Performance Tips
 
 ### 1. Optimize Function Loading
 

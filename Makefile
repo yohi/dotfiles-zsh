@@ -8,7 +8,11 @@ link:
 	mkdir -p $(HOME)
 	ln -sfn $(REPO_ROOT)/zshrc $(HOME)/.zshrc
 	ln -sfn $(REPO_ROOT)/zsh_env $(HOME)/.zsh_env
-	ln -sfn $(REPO_ROOT)/zsh_secrets.example $(HOME)/.zsh_secrets.example
+	@if [ ! -f $(HOME)/.zsh_secrets.example ]; then \
+		cp $(REPO_ROOT)/zsh_secrets.example $(HOME)/.zsh_secrets.example; \
+		chmod 600 $(HOME)/.zsh_secrets.example; \
+		echo "Copied zsh_secrets.example to $(HOME)/.zsh_secrets.example"; \
+	fi
 
 .PHONY: setup
 setup:
