@@ -16,7 +16,7 @@ endef
 
 # コマンドの存在確認: $(call check_command,command)
 define check_command
-	command -v $(1) >/dev/null 2>&1
+	command -v "$(1)" >/dev/null 2>&1
 endef
 
 # スキップメッセージの表示: $(call IDEMPOTENCY_SKIP_MSG,name)
