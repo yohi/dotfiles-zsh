@@ -366,7 +366,12 @@ fi
 # Add dotfiles component bin directories to PATH dynamically
 if [[ -n "$DOTFILES_SHELL_ROOT" ]]; then
     # Load .env files from each component if they exist (Safer parsing)
-    for env_file in "$DOTFILES_SHELL_ROOT"/*/.env(N); do
+    for env_file in "$DOTFILES_SHELL_ROOT"/*/.env(N); do  # 各コンポーネント直下の.envのみ対象（1階層）
+        if [[ ! -r "$env_file" ]]; then
+            echo "❌ .env読み込み失敗: $env_file (読み取り権限がありません)" >&2
+            continue
+        fi
+
         # Use read loop to only export KEY=VALUE lines, avoiding arbitrary command execution
         while IFS= read -r line || [[ -n "$line" ]]; do
             # Skip comments and empty lines
@@ -378,6 +383,9 @@ if [[ -n "$DOTFILES_SHELL_ROOT" ]]; then
                 export "$line"
             fi
         done < "$env_file"
+
+        # デバッグログの出力
+        [[ "$debug_functions" == "true" ]] && echo "✅ .env読み込み完了 (パース済): $env_file"
     done
 
     # Use zsh globbing to find all _bin directories under components
