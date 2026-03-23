@@ -366,11 +366,18 @@ fi
 # Add dotfiles component bin directories to PATH dynamically
 if [[ -n "$DOTFILES_SHELL_ROOT" ]]; then
     # Source .env files from each component if they exist
-    for env_file in "$DOTFILES_SHELL_ROOT"/*/.env(N); do
-        set -a
-        source "$env_file"
-        set +a
+    set -a
+    for env_file in "$DOTFILES_SHELL_ROOT"/*/.env(N); do  # 各コンポーネント直下の.envのみ対象（1階層）
+        if source "$env_file" 2>/dev/null; then
+            [[ "$debug_functions" == "true" ]] && echo "✅ .env読み込み成功: $env_file"
+        else
+            {
+                echo "❌ .env読み込み失敗: $env_file"
+                echo "   構文エラーが含まれている可能性があります"
+            } >&2
+        fi
     done
+    set +a
 
     # Use zsh globbing to find all _bin directories under components
     for bin_dir in "$DOTFILES_SHELL_ROOT"/**/_bin(N/); do
