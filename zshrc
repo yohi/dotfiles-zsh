@@ -365,6 +365,13 @@ fi
 
 # Add dotfiles component bin directories to PATH dynamically
 if [[ -n "$DOTFILES_SHELL_ROOT" ]]; then
+    # Source .env files from each component if they exist
+    for env_file in "$DOTFILES_SHELL_ROOT"/*/.env(N); do
+        set -a
+        source "$env_file"
+        set +a
+    done
+
     # Use zsh globbing to find all _bin directories under components
     for bin_dir in "$DOTFILES_SHELL_ROOT"/**/_bin(N/); do
         export PATH="$bin_dir:$PATH"
