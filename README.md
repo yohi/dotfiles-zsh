@@ -42,3 +42,5 @@ touch .zsh_secrets
 - **環境変数を追加したい場合**: `.zsh_env` を編集してください。
 - **特定の関数ファイルを読み込みたくない場合**: ファイル拡張子を `.disabled` に変更するか、`config.zsh` の `FUNCTIONS_SKIP_PATTERNS` にパターンを追加してください。
 - **デバッグ**: 関数が正しく読み込まれない場合は、`config.zsh` で `FUNCTIONS_DEBUG=true` に設定して詳細を確認してください。
+## ⚠️  Standalone Usage Note
+This repository depends on common Makefile fragments from [dotfiles-core](https://github.com/yohi/dotfiles-core). When using this repository standalone, ensure the  directory is present in the parent directory, or use  as the orchestrator.
