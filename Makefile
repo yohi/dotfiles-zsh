@@ -1,3 +1,6 @@
+include _mk/core.mk
+include _mk/help.mk
+
 REPO_ROOT ?= $(CURDIR)
 .DEFAULT_GOAL := setup
 include _mk/zsh.mk
