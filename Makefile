@@ -25,10 +25,12 @@ link-zshrc:
 .PHONY: link-secrets
 link-secrets:
 	@echo "==> Linking/Copying zsh secrets"
-	@if [ ! -f $(HOME)/.zsh_secrets.example ]; then \
-		cp $(REPO_ROOT)/zsh_secrets.example $(HOME)/.zsh_secrets.example; \
-		chmod 600 $(HOME)/.zsh_secrets.example; \
+	@if [ ! -f "$(HOME)/.zsh_secrets.example" ]; then \
+		cp "$(REPO_ROOT)/zsh_secrets.example" "$(HOME)/.zsh_secrets.example"; \
 		echo "Copied zsh_secrets.example to $(HOME)/.zsh_secrets.example"; \
+	fi
+	@if [ -f "$(HOME)/.zsh_secrets.example" ]; then \
+		chmod 600 "$(HOME)/.zsh_secrets.example"; \
 	fi
 
 .PHONY: setup
