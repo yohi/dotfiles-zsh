@@ -1,7 +1,7 @@
 # Agent Instructions for dotfiles-zsh
 
 > [!IMPORTANT]
-> 共通の基本ルールは [DOTFILES_COMMON_RULES.md](./DOTFILES_COMMON_RULES.md) を参照してください。
+> For the common base rules, please refer to [DOTFILES_COMMON_RULES.md](./DOTFILES_COMMON_RULES.md).
 
 # PROJECT KNOWLEDGE BASE
 
