@@ -43,5 +43,12 @@ touch .zsh_secrets
 - **特定の関数ファイルを読み込みたくない場合**: ファイル拡張子を `.disabled` に変更するか、`config.zsh` の `FUNCTIONS_SKIP_PATTERNS` にパターンを追加してください。
 - **デバッグ**: 関数が正しく読み込まれない場合は、`config.zsh` で `FUNCTIONS_DEBUG=true` に設定して詳細を確認してください。
 
+
 ## ⚠️  Standalone Usage Note
-This repository depends on common Makefile fragments from [dotfiles-core](https://github.com/yohi/dotfiles-core). When using this repository standalone, ensure the `common-mk` directory is present in the parent directory, or use `dotfiles-core` as the orchestrator.
+This repository depends on common Makefile fragments and rules from [dotfiles-core](https://github.com/yohi/dotfiles-core).
+When using this repository standalone, you must manually set up the `common-mk` dependency:
+
+1. Clone or copy the `common-mk` directory from the [dotfiles-core](https://github.com/yohi/dotfiles-core) repository.
+2. Place it such that it's available at `../common-mk/` relative to this repository root.
+
+Alternatively, use `dotfiles-core` to manage the entire setup automatically via `make setup`.
