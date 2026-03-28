@@ -1,5 +1,9 @@
-include _mk/core.mk
-include _mk/help.mk
+# Orchestrator core configuration
+# Note: These are symlinked from ../../common-mk/ when managed by dotfiles-core
+-include _mk/core.mk
+-include _mk/help.mk
+
+# Component-specific logic
 
 REPO_ROOT ?= $(CURDIR)
 .DEFAULT_GOAL := setup
