@@ -49,6 +49,6 @@ This repository depends on common Makefile fragments and rules from [dotfiles-co
 When using this repository standalone, you must manually set up the `common-mk` dependency:
 
 1. Clone or copy the `common-mk` directory from the [dotfiles-core](https://github.com/yohi/dotfiles-core) repository.
-2. Place it such that it's available at `../common-mk/` relative to this repository root.
+2. Place it such that it's available at `../../common-mk/` relative to this repository root.
 
 Alternatively, use `dotfiles-core` to manage the entire setup automatically via `make setup`.
