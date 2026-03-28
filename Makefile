@@ -33,7 +33,13 @@ link-secrets:
 		chmod 600 "$(HOME)/.zsh_secrets.example"; \
 	fi
 
-.PHONY: setup
+.PHONY: all setup clean test
+all: setup ## セットアップを実行します（デフォルト）
+
 setup: ## セットアップ（依存関係、設定適用）を一括実行します
 	@echo "==> Setting up dotfiles-zsh"
 	$(MAKE) setup-zsh
+
+clean: ## クリーンアップ（ダミー）
+
+test: ## テスト（ダミー）
