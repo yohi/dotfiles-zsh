@@ -10,7 +10,7 @@
 
 ---
 
-### Task 1: Update `AGENTS.md` Language
+## Task 1: Update `AGENTS.md` Language
 
 **Files**:
 - Modify: `AGENTS.md:4`
@@ -28,7 +28,7 @@ Run: `git add AGENTS.md && git commit -m "docs(zsh): update Japanese notice to E
 
 ---
 
-### Task 2: Make `Makefile` Includes Mandatory
+## Task 2: Make `Makefile` Includes Mandatory
 
 **Files**:
 - Modify: `Makefile:3-4`
@@ -58,7 +58,7 @@ Run: `git add Makefile && git commit -m "build(zsh): make core Makefile fragment
 
 ---
 
-### Task 3: Update `README.md` Standalone Path
+## Task 3: Update `README.md` Standalone Path
 
 **Files**:
 - Modify: `README.md:52`
@@ -76,7 +76,7 @@ Run: `git add README.md && git commit -m "docs(zsh): correct standalone setup pa
 
 ---
 
-### Task 4: Final Verification
+## Task 4: Final Verification
 
 **Step 1: Run `make` to ensure everything is still working**
 Run: `make help`
