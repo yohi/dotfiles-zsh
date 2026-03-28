@@ -1,3 +1,8 @@
+# Agent Instructions for dotfiles-zsh
+
+> [!IMPORTANT]
+> For the common base rules, please refer to [DOTFILES_COMMON_RULES.md](./DOTFILES_COMMON_RULES.md).
+
 # PROJECT KNOWLEDGE BASE
 
 **Repository:** dotfiles-zsh
