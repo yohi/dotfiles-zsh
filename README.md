@@ -35,6 +35,8 @@
 ├── zsh_secrets.example         # Template for secrets
 ├── config/                     # Internal settings
 ├── functions/                  # Custom functions
+│   ├── aws/                    # AWS CLI helper functions
+│   └── examples/               # Configuration examples
 ├── prompts/                    # Prompt themes (p10k)
 └── starship/                   # Starship prompt configuration
 ```
