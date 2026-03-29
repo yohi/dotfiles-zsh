@@ -34,7 +34,9 @@
 ├── zsh_env                     # Environment variables
 ├── zsh_secrets.example         # Template for secrets
 ├── config/                     # Internal settings
-└── functions/                  # Custom functions
+├── functions/                  # Custom functions
+├── prompts/                    # Prompt themes (p10k)
+└── starship/                   # Starship prompt configuration
 ```
 
 ### 各ファイルの役割
