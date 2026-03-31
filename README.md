@@ -5,7 +5,7 @@ Zshシェルの設定ファイルとカスタム関数が格納されていま�
 ## 管理と共存関係
 
 > [!IMPORTANT]
-> 本リポジトリは [dotfiles-core](https://github.com/yohi/dotfiles) によって管理されるコンポーネントの一つです。
+> 本リポジトリは [dotfiles-core](https://github.com/yohi/dotfiles-core) によって管理されるコンポーネントの一つです。
 
 > [!WARNING]
 > **使用時の注意点**
