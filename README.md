@@ -1,54 +1,20 @@
 # dotfiles-zsh
 
+## 管理と共存関係
+
+本リポジトリは [dotfiles-core](https://github.com/yohi/dotfiles) によって管理されるコンポーネントの一つです。
+
+### ⚠️ 使用時の注意点
+本リポジトリは `dotfiles-core` の共通 Makefile ルール（`common-mk`）に依存しており、実行時には `common-mk` へのシンボリックリンクが必要です。そのため、**本リポジトリ単体での使用（クローンしての利用）はサポートされていません。**
+
+推奨される使用方法は、`dotfiles-core` リポジトリから `make setup` を実行し、適切なディレクトリ構造とシンボリックリンクが構成された状態で利用することです。
+
 このディレクトリには、Zshシェルの設定ファイルとカスタム関数が格納されています。
 
 ## 管理と依存関係
 
-本リポジトリは [dotfiles-core](https://github.com/yohi/dotfiles-core) によって管理されるコンポーネントの一つです。
-
-### ⚠️ 単体使用時の注意点
-
-本リポジトリは `dotfiles-core` の共通 Makefile ルール（`common-mk`）に依存しています。
-単体で使用（クローン）する場合は、以下の手順が必要です：
-
-1. `common-mk` ディレクトリを本リポジトリの親ディレクトリに配置するか、パスを適切に設定してください。
-2. `make help` を実行して、正しく設定されていることを確認してください。
-
-推奨される使用方法は、`dotfiles-core` から `make setup` を実行することです。
-
-## 主要機能
-
-- **プラグイン管理**: Zinit を使用した高速なプラグインロード。
-- **プロンプト**: Powerlevel10k による高機能なコマンドプロンプト。
-- **環境変数の統一**: zsh_env によるシェル非依存な環境変数の管理。
-- **関数ライブラリ**: `functions/` 配下のカスタム Zsh 関数の自動ロード。
-
-## ディレクトリ構成
-
-```text
-.
-├── Makefile
-├── README.md
-├── AGENTS.md
-├── zshrc                       # Main config
-├── zsh_env                     # Environment variables
-├── zsh_secrets.example         # Template for secrets
-├── config/                     # Internal settings
-├── functions/                  # Custom functions
-│   ├── aws/                    # AWS CLI helper functions
-│   └── examples/               # Configuration examples
-├── prompts/                    # Prompt themes (p10k)
-└── starship/                   # Starship prompt configuration
-```
-
-### 各ファイルの役割
-
-#### 1. `zshrc`
-
-メインの設定ファイルです。
-プラグイン管理（Zinit）、プロンプト（Powerlevel10k）、および以下の設定ファイルの読み込みを制御します。
-
-#### 2. `config.zsh` (Internal Framework Settings)
+### 1. `zshrc`
+メインの設定ファイルです。プラグイン管理（Zinit）、プロンプト（Powerlevel10k）、および以下の設定ファイルの読み込みを制御します。
 
 **このZsh設定自体の動作**をカスタマイズするためのファイルです。
 
@@ -93,10 +59,6 @@ touch .zsh_secrets
 
 ## カスタマイズ
 
-- **環境変数を追加したい場合**: zsh_env を編集してください。
-- **特定の関数ファイルを読み込みたくない場合**:
-  ファイル拡張子を `.disabled` に変更するか、
-  `config.zsh` の `FUNCTIONS_SKIP_PATTERNS` にパターンを追加してください。
-- **デバッグ**:
-  関数が正しく読み込まれない場合は、
-  `config.zsh` で `FUNCTIONS_DEBUG=true` に設定して詳細を確認してください。
+- **環境変数を追加したい場合**: `.zsh_env` を編集してください。
+- **特定の関数ファイルを読み込みたくない場合**: ファイル拡張子を `.disabled` に変更するか、`config.zsh` の `FUNCTIONS_SKIP_PATTERNS` にパターンを追加してください。
+- **デバッグ**: 関数が正しく読み込まれない場合は、`config.zsh` で `FUNCTIONS_DEBUG=true` に設定して詳細を確認してください。

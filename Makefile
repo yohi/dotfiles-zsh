@@ -1,21 +1,12 @@
-# Orchestrator core configuration
-# Note: These are symlinked from ../../common-mk/ when managed by dotfiles-core
-include _mk/core.mk
-include _mk/help.mk
+.DEFAULT_GOAL := help
 
-# Component-specific logic
+# 共通ルールの読み込み
+-include _mk/zsh.mk
 
-REPO_ROOT ?= $(CURDIR)
-include _mk/zsh.mk
+.PHONY: help
+help: ## ヘルプを表示
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: all setup clean test
-all: setup ## セットアップを実行します（デフォルト）
-
-setup: ## セットアップ（依存関係、設定適用）を一括実行します
-	@echo "==> Setting up dotfiles-zsh"
-	$(MAKE) link
-	$(MAKE) setup-zsh
-
-clean: ## クリーンアップ（ダミー）
-
-test: ## テスト（ダミー）
+.PHONY: install setup
+install: install-zsh ## Zsh 関連のインストール
+setup: setup-zsh ## Zsh の設定適用 (シンボリックリンク作成)

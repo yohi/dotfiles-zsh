@@ -15,8 +15,8 @@ export DOTFILES_SHELL_ROOT="${${(%):-%N}:A:h:h}" # resolves to components/
 export ZSH_CONFIG_DIR="${DOTFILES_SHELL_ROOT}/dotfiles-zsh"
 
 # Load environment variables and secrets
-[[ -f "$ZSH_CONFIG_DIR/dot-zsh_env" ]] && source "$ZSH_CONFIG_DIR/dot-zsh_env"
-[[ -f "$ZSH_CONFIG_DIR/dot-zsh_secrets" ]] && source "$ZSH_CONFIG_DIR/dot-zsh_secrets"
+[[ -f "$ZSH_CONFIG_DIR/zsh_env" ]] && source "$ZSH_CONFIG_DIR/zsh_env"
+[[ -f "$ZSH_CONFIG_DIR/.zsh_secrets" ]] && source "$ZSH_CONFIG_DIR/.zsh_secrets"
 
 # Claude Code オプトアウト環境変数
 export DISABLE_TELEMETRY=1

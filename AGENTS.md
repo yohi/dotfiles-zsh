@@ -5,6 +5,17 @@
 
 # PROJECT KNOWLEDGE BASE
 
+
+## COMPONENT LAYOUT CONVENTION
+
+This repository is part of the **dotfiles polyrepo** managed by [dotfiles-core](https://github.com/yohi/dotfiles).
+
+### ⚠️ CRITICAL: SYMBOLIC LINK & STANDALONE USAGE
+- **Standalone usage is NOT supported.** This repository depends on the central `common-mk` rules.
+- **Symbolic Links:** This repository relies on symbolic links to `common-mk`. **NEVER** suggest or perform a replacement of these symbolic links with physical files/directories. 
+- **SSOT:** Always respect the "Single Source of Truth" principle. Shared logic resides in `dotfiles-core`, and components must remain thin wrappers or specific configurations.
+- **Architectural Compliance:** All modifications must adhere to the layout defined in the central [ARCHITECTURE.md](https://github.com/yohi/dotfiles/blob/master/docs/ARCHITECTURE.md).
+
 **Repository:** dotfiles-zsh
 **Role:** Zsh shell configuration — .zshrc, environment variables, custom functions, prompt themes (Starship / p10k)
 
@@ -33,7 +44,7 @@ dotfiles-zsh/
 - `functions/` are sourced by `zshrc`, NOT symlinked.
 - `config/config.zsh` contains component-internal configuration (not linked).
 - `starship/starship.toml` is referenced via a separate mechanism, not directly linked.
-- Symlinks are managed explicitly via `ln -sfn` in the Makefile (`make link`).
+- Symlinks are managed explicitly via `ln -sfn` in the Makefile (`make setup` / `make setup-zsh`).
 
 ## CODE STYLE
 
