@@ -44,7 +44,7 @@ dotfiles-zsh/
 - `functions/` are sourced by `zshrc`, NOT symlinked.
 - `config/config.zsh` contains component-internal configuration (not linked).
 - `starship/starship.toml` is referenced via a separate mechanism, not directly linked.
-- Symlinks are managed explicitly via `ln -sfn` in the Makefile (`make link`).
+- Symlinks are managed explicitly via `ln -sfn` in the Makefile (`make setup` / `make setup-zsh`).
 
 ## CODE STYLE
 
