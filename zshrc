@@ -406,3 +406,20 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # opencode
 export PATH="$HOME/.opencode/bin:$PATH"
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/home/y_ohi/google-cloud-sdk/path.zsh.inc' ]; then . '/home/y_ohi/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/home/y_ohi/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/y_ohi/google-cloud-sdk/completion.zsh.inc'; fi
+
+eval ""
+export NPM_CONFIG_PREFIX="$HOME/.npm-global"
+export PATH="$HOME/.npm-global/bin:$PATH"
+
+
+# Added by Antigravity CLI installer
+export PATH="/home/y_ohi/.local/bin:$PATH"
+
+# dotfiles-ai .env
+if [ -f "$HOME/dotfiles/components/dotfiles-ai/.env" ]; then set -a; . "$HOME/dotfiles/components/dotfiles-ai/.env"; set +a; fi
