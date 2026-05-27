@@ -25,33 +25,30 @@ opencode() {
         fi
     done
 
-    # 2. Profile Loading (if PROFILE is set)
+    # 2. Profile Loading
     local effective_profile="${PROFILE:-personal}"
-    if [[ -n "$effective_profile" ]]; then
-        # Resolve dotfiles-ai directory
-        # DOTFILES_SHELL_ROOT is defined in dotfiles-zsh/zshrc
-        local ai_component_dir="${DOTFILES_SHELL_ROOT}/dotfiles-ai"
-        local env_file="${ai_component_dir}/opencode/${effective_profile}.env"
+    local ai_component_dir="${DOTFILES_SHELL_ROOT}/dotfiles-ai"
+    local env_file="${ai_component_dir}/opencode/${effective_profile}.env"
+    local status_msg="✅ Profile [${effective_profile}]"
 
-        if [[ -f "$env_file" ]]; then
-            # Load environment variables
-            while IFS= read -r line || [[ -n "$line" ]]; do
-                # Skip comments and empty lines
-                [[ "$line" =~ ^[[:space:]]*# ]] && continue
-                [[ -z "${line//[[:space:]]/}" ]] && continue
-                
-                # Export the variable
-                export "${line}"
-            done < "$env_file"
+    if [[ -f "$env_file" ]]; then
+        # Load environment variables
+        while IFS= read -r line || [[ -n "$line" ]]; do
+            # Skip comments and empty lines
+            [[ "$line" =~ ^[[:space:]]*# ]] && continue
+            [[ -z "${line//[[:space:]]/}" ]] && continue
             
-            echo "✅ Profile [${effective_profile}] loaded"
-        else
-            echo "⚠️  Profile [${effective_profile}] specified but $env_file not found." >&2
-        fi
+            # Export the variable
+            export "${line}"
+        done < "$env_file"
+    else
+        echo "⚠️  Profile [${effective_profile}] specified but $env_file not found." >&2
+        status_msg="❌ Profile [${effective_profile}] not found"
     fi
 
-    # 3. Execution
+    # 3. Execution & Reporting
     if [[ -n "$port" ]]; then
+        echo "${status_msg} | Port [${port}]"
         # Add --port only if we found an available one and it's not already specified
         if [[ "$*" != *"--port"* ]]; then
             command opencode --port "$port" "$@"
@@ -59,6 +56,7 @@ opencode() {
             command opencode "$@"
         fi
     else
+        echo "${status_msg} | Port [default]"
         command opencode "$@"
     fi
 }
