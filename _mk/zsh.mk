@@ -18,6 +18,7 @@ setup-zsh: ## Zsh の設定適用 (シンボリックリンク作成)
 	@mkdir -p "$(HOME)"
 	$(call SAFE_LN,$(ZSH_DIR)/zshrc,$(HOME)/.zshrc)
 	$(call SAFE_LN,$(ZSH_DIR)/zsh_env,$(HOME)/.zsh_env)
+	$(call SAFE_LN,$(ZSH_DIR)/npmrc,$(HOME)/.npmrc)
 	@if [ ! -f "$(HOME)/.zsh_secrets" ]; then \
 		cp "$(ZSH_DIR)/zsh_secrets.example" "$(HOME)/.zsh_secrets" && \
 		echo "  -> Created $(HOME)/.zsh_secrets from example"; \

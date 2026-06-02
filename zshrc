@@ -417,9 +417,34 @@ eval ""
 export NPM_CONFIG_PREFIX="$HOME/.npm-global"
 export PATH="$HOME/.npm-global/bin:$PATH"
 
+# nexus-commit settings
+export NEXUS_COMMIT_LLM_URL="http://localhost:11434/v1"
+export NEXUS_COMMIT_LLM_MODEL="qwen2.5-coder:1.5b"
+export NEXUS_COMMIT_LANG="ja"
+
+# dotfiles-ai .env
+if [ -f "$HOME/dotfiles/components/dotfiles-ai/.env" ]; then set -a; . "$HOME/dotfiles/components/dotfiles-ai/.env"; set +a; fi
 
 # Added by Antigravity CLI installer
 export PATH="/home/y_ohi/.local/bin:$PATH"
 
 # dotfiles-ai .env
 if [ -f "$HOME/dotfiles/components/dotfiles-ai/.env" ]; then set -a; . "$HOME/dotfiles/components/dotfiles-ai/.env"; set +a; fi
+
+# Nexus Commit Configuration
+export NEXUS_COMMIT_LLM_URL="http://localhost:11434/api/generate"
+export NEXUS_COMMIT_LLM_MODEL="qwen2.5-coder:1.5b"
+# NEXUS_API_URL 未設定のため、接続時に警告が出る可能性があります
+
+# GitHub CLIを用いたGITHUB_TOKENの非同期取得とキャッシュ（zsh起動遅延防止）
+if command -v gh >/dev/null 2>&1; then
+  (gh auth token >| "$HOME/.gh_token.tmp" 2>/dev/null && mv "$HOME/.gh_token.tmp" "$HOME/.gh_token" 2>/dev/null &)
+  if [ -s "$HOME/.gh_token" ]; then
+    export GITHUB_TOKEN=$(cat "$HOME/.gh_token")
+  else
+    export GITHUB_TOKEN="dummy"
+  fi
+else
+  export GITHUB_TOKEN="dummy"
+fi
+
