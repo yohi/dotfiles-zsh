@@ -1,3 +1,4 @@
+include _mk/core.mk
 .DEFAULT_GOAL := help
 
 # 共通ルールの読み込み
