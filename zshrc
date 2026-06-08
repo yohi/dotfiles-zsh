@@ -28,7 +28,7 @@ export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
 setopt correct
 alias la="ls -a"
 alias ll="ls -l"
-alias du="du -h"
+# alias du="du -h"
 alias df="df -h"
 alias ld="lazydocker"
 alias lg="lazygit"
@@ -277,6 +277,10 @@ zinit light zdharma-continuum/fast-syntax-highlighting
 zinit light zsh-users/zsh-autosuggestions
 zinit light junegunn/fzf-bin
 
+# Load AWS functions asynchronously
+zinit ice wait"0" lucid
+zinit snippet "$ZSH_CONFIG_DIR/functions/aws.zsh"
+
 # Load powerlevel10k theme
 zinit ice depth"1"
 zinit light romkatv/powerlevel10k
@@ -328,7 +332,8 @@ if [[ -d "$ZSH_CONFIG_DIR/$functions_subdir" ]]; then
         typeset skip=false
         if (( ${+FUNCTIONS_SKIP_PATTERNS} )); then
             for pattern in "${FUNCTIONS_SKIP_PATTERNS[@]}"; do
-                if [[ "${func_file:t}" == ${~pattern} ]]; then
+                # ファイル名単体、または絶対パスに含まれるパターンでマッチング
+                if [[ "${func_file:t}" == ${~pattern} || "$func_file" == *${~pattern}* ]]; then
                     skip=true
                     break
                 fi
@@ -406,3 +411,35 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # opencode
 export PATH="$HOME/.opencode/bin:$PATH"
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]; then . "$HOME/google-cloud-sdk/path.zsh.inc"; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/google-cloud-sdk/completion.zsh.inc"; fi
+
+export NPM_CONFIG_PREFIX="$HOME/.npm-global"
+export PATH="$HOME/.npm-global/bin:$PATH"
+
+# nexus-commit settings
+export NEXUS_COMMIT_LLM_URL="http://localhost:11434/v1"
+export NEXUS_COMMIT_LLM_MODEL="qwen2.5-coder:1.5b"
+export NEXUS_COMMIT_LANG="ja"
+
+# dotfiles-ai .env
+if [ -f "$HOME/dotfiles/components/dotfiles-ai/.env" ]; then set -a; . "$HOME/dotfiles/components/dotfiles-ai/.env"; set +a; fi
+
+# Added by Antigravity CLI installer
+export PATH="$HOME/.local/bin:$PATH"
+# GitHub CLIを用いたGITHUB_TOKENの非同期取得とキャッシュ（zsh起動遅延防止）
+if command -v gh >/dev/null 2>&1; then
+  (umask 077; gh auth token >| "$HOME/.gh_token.tmp" 2>/dev/null && mv "$HOME/.gh_token.tmp" "$HOME/.gh_token" 2>/dev/null && chmod 600 "$HOME/.gh_token" 2>/dev/null &)
+  if [ -s "$HOME/.gh_token" ]; then
+    export GITHUB_TOKEN=$(cat "$HOME/.gh_token")
+  else
+    export GITHUB_TOKEN=""
+  fi
+else
+  export GITHUB_TOKEN=""
+fi
+

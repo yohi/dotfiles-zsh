@@ -1,6 +1,7 @@
 .DEFAULT_GOAL := help
 
 # 共通ルールの読み込み
+-include _mk/core.mk
 -include _mk/zsh.mk
 
 .PHONY: help
