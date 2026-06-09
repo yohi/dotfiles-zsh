@@ -1,3 +1,4 @@
+# dotfiles-core が提供する core.mk を読み込む（スタンドアロン実行は非対応）
 include _mk/core.mk
 .DEFAULT_GOAL := help
 
