@@ -27,4 +27,8 @@ setup-zsh: ## Zsh の設定適用 (シンボリックリンク作成)
 .PHONY: install-zsh
 install-zsh: ## Zsh 関連のツールインストール
 	@echo "==> Installing zsh dependencies"
-	sudo apt-get update && sudo apt-get install -y zsh fzf
+	@if ! command -v zsh >/dev/null 2>&1 || ! command -v fzf >/dev/null 2>&1; then \
+		sudo apt-get update && sudo apt-get install -y zsh fzf; \
+	else \
+		echo "✅ zsh and fzf are already installed"; \
+	fi
