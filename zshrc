@@ -275,13 +275,10 @@ zinit light-mode for \
 zinit light zdharma-continuum/fast-syntax-highlighting
 # zinit light zdharma/history-search-multi-word  # Disabled due to conflict with peco
 zinit light zsh-users/zsh-autosuggestions
-zinit light junegunn/fzf-bin
-
-# Load AWS functions asynchronously
-zinit ice wait"0" lucid
-zinit snippet "$ZSH_CONFIG_DIR/functions/aws.zsh"
+# zinit light junegunn/fzf-bin
 
 # Load powerlevel10k theme
+
 zinit ice depth"1"
 zinit light romkatv/powerlevel10k
 
@@ -431,15 +428,22 @@ if [ -f "$HOME/dotfiles/components/dotfiles-ai/.env" ]; then set -a; . "$HOME/do
 
 # Added by Antigravity CLI installer
 export PATH="$HOME/.local/bin:$PATH"
-# GitHub CLIを用いたGITHUB_TOKENの非同期取得とキャッシュ（zsh起動遅延防止）
+# GitHub CLIを用いたGITHUB_TOKENの同期・非同期ハイブリッド取得
 if command -v gh >/dev/null 2>&1; then
-  (umask 077; gh auth token >| "$HOME/.gh_token.tmp" 2>/dev/null && mv "$HOME/.gh_token.tmp" "$HOME/.gh_token" 2>/dev/null && chmod 600 "$HOME/.gh_token" 2>/dev/null &)
+  # キャッシュファイルが無い、または1時間(60分)以上古い場合は同期的に取得
+  if [[ ! -s "$HOME/.gh_token" ]] || [[ -n "$(find "$HOME/.gh_token" -mmin +60 2>/dev/null)" ]]; then
+    gh auth token >| "$HOME/.gh_token" 2>/dev/null
+    chmod 600 "$HOME/.gh_token" 2>/dev/null
+  else
+    # それ以外はバックグラウンドで更新して次回の起動に備える
+    (umask 077; gh auth token >| "$HOME/.gh_token.tmp" 2>/dev/null && mv "$HOME/.gh_token.tmp" "$HOME/.gh_token" 2>/dev/null && chmod 600 "$HOME/.gh_token" 2>/dev/null &)
+  fi
+
   if [ -s "$HOME/.gh_token" ]; then
     export GITHUB_TOKEN=$(cat "$HOME/.gh_token")
-  else
-    export GITHUB_TOKEN=""
   fi
-else
-  export GITHUB_TOKEN=""
 fi
 
+
+
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv 2>/dev/null || brew shellenv)"

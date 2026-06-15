@@ -43,8 +43,13 @@
 # ===================================================================
 
 # モジュールディレクトリのパスを取得
-# ${(%):-%N} は source された場合でも正しく現在のファイルパスを取得できる
-AWS_FUNCTIONS_DIR="${${(%):-%N}:A:h}/aws"
+# 1. ZSH_CONFIG_DIR が定義されている場合はそれを使用 (dotfiles-zsh の zshrc からの読み込み)
+# 2. そうでない場合は source されたファイルの場所から解決
+if [[ -n "$ZSH_CONFIG_DIR" ]]; then
+    AWS_FUNCTIONS_DIR="$ZSH_CONFIG_DIR/functions/aws"
+else
+    AWS_FUNCTIONS_DIR="${${(%):-%N}:A:h}/aws"
+fi
 
 # デバッグモード
 [[ -n "$ZSH_FUNCTIONS_DEBUG" ]] && echo "📂 AWS関数ディレクトリ: $AWS_FUNCTIONS_DIR"

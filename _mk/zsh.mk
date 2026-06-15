@@ -20,12 +20,30 @@ setup-zsh: ## Zsh の設定適用 (シンボリックリンク作成)
 	$(call SAFE_LN,$(ZSH_DIR)/zsh_env,$(HOME)/.zsh_env)
 	$(call SAFE_LN,$(ZSH_DIR)/npmrc,$(HOME)/.npmrc)
 	@$(MAKE) .setup-zsh-secrets-impl
+	@$(MAKE) .setup-gh-auth
+
+.PHONY: .setup-gh-auth
+.setup-gh-auth:
+	@if command -v gh >/dev/null 2>&1; then \
+		echo "==> Checking GitHub CLI authentication status..."; \
+		SCOPES=$$(gh auth status --show-token 2>&1 | grep "Token scopes" | tr -d "'"); \
+		case "$$SCOPES" in \
+			*read:packages*) echo "  ✅ GitHub CLI is authenticated with required scopes." ;; \
+			*) \
+				echo "  ⚠️  GitHub CLI is not authenticated or lacks 'read:packages' scope."; \
+				echo "  Please run the following command to login:"; \
+				echo "    unset GITHUB_TOKEN && gh auth login -s read:packages,write:packages,repo,workflow,gist,read:org"; \
+				;; \
+		esac; \
+	else \
+		echo "  ⚠️  GitHub CLI (gh) not found. Please install it for package access."; \
+	fi
 
 .PHONY: .setup-zsh-secrets-impl
 .setup-zsh-secrets-impl:
-	@if [ ! -f "$(HOME)/.zsh_secrets" ]; then \
-		cp "$(ZSH_DIR)/zsh_secrets.example" "$(HOME)/.zsh_secrets"; \
-		echo "  ✅ Created $(HOME)/.zsh_secrets from example."; \
+	@if [ ! -f "$(ZSH_DIR)/.zsh_secrets" ]; then \
+		cp "$(ZSH_DIR)/zsh_secrets.example" "$(ZSH_DIR)/.zsh_secrets"; \
+		echo "  ✅ Created $(ZSH_DIR)/.zsh_secrets from example."; \
 		UPDATE_ALL=y; \
 	else \
 		printf "⚠️  .zsh_secrets already exists. Update variables? (y/N) [n]: "; \
@@ -34,16 +52,16 @@ setup-zsh: ## Zsh の設定適用 (シンボリックリンク作成)
 	fi; \
 	VARS=$$(grep -E '^export [A-Z0-9_]+=' "$(ZSH_DIR)/zsh_secrets.example" | sed -E 's/^export ([A-Z0-9_]+)=.*/\1/'); \
 	for var in $$VARS; do \
-		CURRENT_VAL=$$(grep -E "^export $$var=" "$(HOME)/.zsh_secrets" | sed -E 's/^export [^=]+="?([^"]*)"?/\1/' | head -n 1); \
+		CURRENT_VAL=$$(grep -E "^export $$var=" "$(ZSH_DIR)/.zsh_secrets" | sed -E 's/^export [^=]+="?([^"]*)"?/\1/' | head -n 1); \
 		EXAMPLE_VAL=$$(grep -E "^export $$var=" "$(ZSH_DIR)/zsh_secrets.example" | sed -E 's/^export [^=]+="?([^"]*)"?/\1/' | head -n 1); \
 		if [ "$$UPDATE_ALL" = "y" ] || [ -z "$$CURRENT_VAL" ] || [ "$$CURRENT_VAL" = "$$EXAMPLE_VAL" ]; then \
 			printf "🔑 $$var [$$CURRENT_VAL]: "; \
 			read new_val; \
 			new_val=$${new_val:-$$CURRENT_VAL}; \
-			if grep -q "^export $$var=" "$(HOME)/.zsh_secrets"; then \
-				sed -i "s|^export $$var=.*|export $$var=\"$$new_val\"|" "$(HOME)/.zsh_secrets"; \
+			if grep -q "^export $$var=" "$(ZSH_DIR)/.zsh_secrets"; then \
+				sed -i "s|^export $$var=.*|export $$var=\"$$new_val\"|" "$(ZSH_DIR)/.zsh_secrets"; \
 			else \
-				echo "export $$var=\"$$new_val\"" >> "$(HOME)/.zsh_secrets"; \
+				echo "export $$var=\"$$new_val\"" >> "$(ZSH_DIR)/.zsh_secrets"; \
 			fi; \
 		fi; \
 	done

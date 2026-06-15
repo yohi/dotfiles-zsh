@@ -30,7 +30,8 @@ All changes MUST comply with the central layout rules. Please refer to the centr
 dotfiles-zsh/
 ├── zshrc                       # [Link Target] Main Zsh configuration → ~/.zshrc
 ├── zsh_env                     # [Link Target] Environment variables → ~/.zsh_env
-├── zsh_secrets.example         # [Link Target] Secrets template → ~/.zsh_secrets.example
+├── zsh_secrets.example         # Secrets template (Copy to .zsh_secrets)
+├── .zsh_secrets                # [Local Only] Actual secrets (Git ignored)
 ├── config/                     # Internal config / templates
 ├── functions/                  # Zsh function library (sourced by zshrc)
 │   └── aws/                    # AWS CLI helper functions
