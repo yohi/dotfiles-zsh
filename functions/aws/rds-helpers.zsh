@@ -1337,7 +1337,7 @@ _rds_ssm_connect_to_database() {
                 echo
                 echo "📚 詳細情報:"
                 echo "   README.md のトラブルシューティングセクションを参照してください"
-                echo "   ~/dots/zsh/functions/aws/README.md"
+                echo "   ~/dotfiles/components/dotfiles-zsh/functions/aws/README.md"
                 echo
             fi
         fi
