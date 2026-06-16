@@ -16,6 +16,8 @@ FUNCTIONS_PATTERN="**/*.zsh"               # 読み込み対象ファイル
 
 # スキップするファイルパターン
 FUNCTIONS_SKIP_PATTERNS=(
+    "aws.zsh"
+    "functions/aws/*"
     "*.broken"
     "*.disabled"
     "*.tmp"

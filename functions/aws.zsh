@@ -160,5 +160,3 @@ aws-help() {
     echo "  ├── rds.zsh          # RDS-SSMメイン"
     echo "  └── rds-helpers.zsh  # RDS内部ヘルパー"
 }
-
-echo "✅ AWS関数が読み込まれました。'aws-help' でヘルプを表示できます。"
