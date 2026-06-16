@@ -43,25 +43,32 @@ setup-zsh: ## Zsh の設定適用 (シンボリックリンク作成)
 .setup-zsh-secrets-impl:
 	@if [ ! -f "$(ZSH_DIR)/.zsh_secrets" ]; then \
 		cp "$(ZSH_DIR)/zsh_secrets.example" "$(ZSH_DIR)/.zsh_secrets"; \
-		echo "  ✅ Created $(ZSH_DIR)/.zsh_secrets from example."; \
+		chmod 600 "$(ZSH_DIR)/.zsh_secrets"; \
+		echo "  ✅ Created $(ZSH_DIR)/.zsh_secrets from example and set restrictive permissions."; \
 		UPDATE_ALL=y; \
 	else \
-		printf "⚠️  .zsh_secrets already exists. Update variables? (y/N) [n]: "; \
-		read confirm; \
-		if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ]; then UPDATE_ALL=y; else UPDATE_ALL=n; fi; \
+		UPDATE_ALL=n; \
+		if [ -t 0 ] && [ -z "$$CI" ]; then \
+			printf "⚠️  .zsh_secrets already exists. Update variables? (y/N) [n]: "; \
+			read confirm; \
+			if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ]; then UPDATE_ALL=y; fi; \
+		fi; \
 	fi; \
 	VARS=$$(grep -E '^export [A-Z0-9_]+=' "$(ZSH_DIR)/zsh_secrets.example" | sed -E 's/^export ([A-Z0-9_]+)=.*/\1/'); \
 	for var in $$VARS; do \
 		CURRENT_VAL=$$(grep -E "^export $$var=" "$(ZSH_DIR)/.zsh_secrets" | sed -E 's/^export [^=]+="?([^"]*)"?/\1/' | head -n 1); \
 		EXAMPLE_VAL=$$(grep -E "^export $$var=" "$(ZSH_DIR)/zsh_secrets.example" | sed -E 's/^export [^=]+="?([^"]*)"?/\1/' | head -n 1); \
 		if [ "$$UPDATE_ALL" = "y" ] || [ -z "$$CURRENT_VAL" ] || [ "$$CURRENT_VAL" = "$$EXAMPLE_VAL" ]; then \
-			printf "🔑 $$var [$$CURRENT_VAL]: "; \
-			read new_val; \
-			new_val=$${new_val:-$$CURRENT_VAL}; \
-			if grep -q "^export $$var=" "$(ZSH_DIR)/.zsh_secrets"; then \
-				sed -i "s|^export $$var=.*|export $$var=\"$$new_val\"|" "$(ZSH_DIR)/.zsh_secrets"; \
-			else \
-				echo "export $$var=\"$$new_val\"" >> "$(ZSH_DIR)/.zsh_secrets"; \
+			if [ -t 0 ] && [ -z "$$CI" ]; then \
+				printf "🔑 Enter value for $$var: "; \
+				read new_val; \
+				new_val=$${new_val:-$$CURRENT_VAL}; \
+				escaped_val=$$(echo "$$new_val" | sed 's/[&/\]/\\&/g'); \
+				if grep -q "^export $$var=" "$(ZSH_DIR)/.zsh_secrets"; then \
+					sed -i "s|^export $$var=.*|export $$var=\"$$escaped_val\"|" "$(ZSH_DIR)/.zsh_secrets"; \
+				else \
+					echo "export $$var=\"$$new_val\"" >> "$(ZSH_DIR)/.zsh_secrets"; \
+				fi; \
 			fi; \
 		fi; \
 	done
