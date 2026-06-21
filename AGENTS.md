@@ -28,6 +28,7 @@ All changes MUST comply with the central layout rules. Please refer to the centr
 
 ```text
 dotfiles-zsh/
+├── zshenv                       # [Link Target] Zsh environment (loaded first) → ~/.zshenv
 ├── zshrc                       # [Link Target] Main Zsh configuration → ~/.zshrc
 ├── zsh_env                     # [Link Target] Environment variables → ~/.zsh_env
 ├── zsh_secrets.example         # Secrets template (Copy to .zsh_secrets)
