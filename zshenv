@@ -5,7 +5,7 @@
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 
 # uv
-export PATH="$HOME/.local/bin:$PATH"
+[[ ":$PATH:" != *":$HOME/.local/bin:"* ]] && export PATH="$HOME/.local/bin:$PATH"
 
 # Fix Homebrew Zsh version path issue - add system Zsh functions as fallback
 # When Homebrew updates Zsh (e.g., 5.9 -> 5.9.1), the versioned Cellar path
