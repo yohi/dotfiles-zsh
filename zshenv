@@ -7,7 +7,28 @@
 # uv
 export PATH="/home/y_ohi/.local/bin:$PATH"
 
-# Fix Homebrew Zsh version path issue - add system Zsh functions as fallback
-# When Homebrew updates Zsh (e.g., 5.9 -> 5.9.1), the versioned Cellar path
-# in fpath may break. System Zsh functions are stable and version-independent.
-fpath=(/usr/share/zsh/functions $fpath)
+# Fix Homebrew Zsh version path issue in fpath.
+# When Homebrew updates Zsh (e.g., 5.9 -> 5.9.1), the stale version path in the inherited FPATH breaks.
+# We dynamically replace the stale version in the fpath array with the currently installed version.
+if [[ -d /home/linuxbrew/.linuxbrew/Cellar/zsh ]]; then
+    # Get the currently installed version of Zsh via Homebrew
+    typeset active_zsh_ver
+    active_zsh_ver=$(ls -1 /home/linuxbrew/.linuxbrew/Cellar/zsh 2>/dev/null | head -n 1)
+    if [[ -n "$active_zsh_ver" ]]; then
+        # Replace "/Cellar/zsh/<stale_version>/" with the active version in fpath array safely
+        # Using [0-9.]# (zsh notation for 0 or more numbers/dots) to avoid greedy matching over slashes
+        fpath=(${fpath[@]/\/Cellar\/zsh\/[0-9.]#\//\/Cellar\/zsh\/$active_zsh_ver\/})
+    fi
+fi
+
+# Ensure standard system paths and subdirectories are present in fpath as fallback
+# Using zsh globbing to dynamically add all subdirectories under /usr/share/zsh/functions
+if [[ -d /usr/share/zsh/functions ]]; then
+    fpath=(
+        /usr/share/zsh/functions
+        /usr/share/zsh/functions/**/*(N/)
+        $fpath
+    )
+fi
+
+
