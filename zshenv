@@ -2,10 +2,10 @@
 # This file is sourced on all invocations of the shell.
 # Load order: .zshenv → .zshrc → .zsh_env
 
-. "$HOME/.cargo/env"
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 
 # uv
-export PATH="/home/y_ohi/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 
 # Fix Homebrew Zsh version path issue - add system Zsh functions as fallback
 # When Homebrew updates Zsh (e.g., 5.9 -> 5.9.1), the versioned Cellar path

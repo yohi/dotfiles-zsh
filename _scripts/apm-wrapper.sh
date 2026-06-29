@@ -1,11 +1,28 @@
 #!/bin/bash
 # apm-wrapper.sh: wrapper for standard APM command to allow transient local overrides
+set -euo pipefail
 
 # Find the real apm command (excluding this wrapper script)
-REAL_APM=$(which -a apm | grep -v "$0" | head -n 1)
+REAL_APM=$(which -a apm | grep -v "$0" | head -n 1 || true)
 
-if [ "$1" = "install" ] && [ -f apm.yml ]; then
+if [ -z "$REAL_APM" ]; then
+  echo "Error: standard apm command not found on PATH." >&2
+  exit 1
+fi
+
+if [ "${1:-}" = "install" ] && [ -f apm.yml ]; then
   echo "--> [Wrapper] Applying version overrides from version.env temporarily..."
+
+  # Setup cleanup trap to ensure file restoration even on failure
+  cleanup() {
+    if [ -f apm.yml.bak ]; then
+      mv apm.yml.bak apm.yml
+    fi
+    if [ -f apm.lock.yaml.bak ]; then
+      mv apm.lock.yaml.bak apm.lock.yaml
+    fi
+  }
+  trap cleanup EXIT INT TERM
 
   # 1. Back up original files
   cp apm.yml apm.yml.bak
@@ -43,12 +60,7 @@ with open("apm.yml", "w", encoding="utf-8") as f:
 
   # 3. Run the real apm install command
   "$REAL_APM" "$@"
-
-  # 4. Restore original files
-  mv apm.yml.bak apm.yml
-  if [ -f apm.lock.yaml.bak ]; then
-    mv apm.lock.yaml.bak apm.lock.yaml
-  fi
+  
   echo "--> [Wrapper] Version overrides reverted. Working tree clean."
 else
   # Delegate other commands to real apm
