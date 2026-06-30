@@ -36,3 +36,9 @@ export EDITOR=nvim
 # Google Vertex
 export GOOGLE_VERTEX_LOCATION=global
 export GOOGLE_VERTEX_PROJECT="your-project-id" # See .zsh_secrets for local override
+
+# Nexus Ollama Thread
+export NEXUS_OLLAMA_NUM_THREAD=2
+
+# Ollama
+export OLLAMA_NUM_PARALLEL=1

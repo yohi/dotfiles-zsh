@@ -17,6 +17,7 @@ setup-zsh: ## Zsh の設定適用 (シンボリックリンク作成)
 	@echo "==> Linking zsh configuration files"
 	@mkdir -p "$(HOME)"
 	$(call SAFE_LN,$(ZSH_DIR)/zshrc,$(HOME)/.zshrc)
+	$(call SAFE_LN,$(ZSH_DIR)/zshenv,$(HOME)/.zshenv)
 	$(call SAFE_LN,$(ZSH_DIR)/zsh_env,$(HOME)/.zsh_env)
 	$(call SAFE_LN,$(ZSH_DIR)/npmrc,$(HOME)/.npmrc)
 	$(call SAFE_LN,$(ZSH_DIR)/prompts/p10.zsh,$(HOME)/.p10k.zsh)
