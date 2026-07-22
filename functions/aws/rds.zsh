@@ -29,8 +29,14 @@
 # ===================================================================
 
 # rds-helpers.zsh は起動時間短縮のため zshrc 読み込み対象から外している。
-# rds-ssm 実行時にここで読み込む。
-[[ -f "${0:A:h}/rds-helpers.zsh" ]] && source "${0:A:h}/rds-helpers.zsh"
+# rds-ssm / rds-ssm-cleanup 実行時にここで遅延読み込みする。
+_rds_load_helpers() {
+    [[ -n "${_RDS_HELPERS_LOADED:-}" ]] && return 0
+    [[ -f "${0:A:h}/rds-helpers.zsh" ]] || return 1
+    source "${0:A:h}/rds-helpers.zsh"
+    typeset -g _RDS_HELPERS_LOADED=1
+}
+
 
 # ===================================================================
 # RDS-SSM接続機能
@@ -53,6 +59,9 @@ rds-ssm() {
     local search_all_regions=false
     local connectable_only=true  # デフォルトで接続可能のみ表示
     local parallel_processing=true  # デフォルトで並列実行
+
+    # 必要なヘルパー関数を遅延読み込み
+    _rds_load_helpers || { echo "❌ rds-helpers.zsh の読み込みに失敗しました" >&2; return 1; }
 
     # ポートフォワーディングプロセス管理用グローバル変数
     export RDS_SSM_PORT_FORWARD_PID=""
@@ -113,6 +122,9 @@ rds-ssm() {
 }
 
 rds-ssm-cleanup() {
+    # 必要なヘルパー関数を遅延読み込み
+    _rds_load_helpers || { echo "❌ rds-helpers.zsh の読み込みに失敗しました" >&2; return 1; }
+
     local target_port="${1:-all}"
 
     echo "🧹 手動クリーンアップを実行します..."

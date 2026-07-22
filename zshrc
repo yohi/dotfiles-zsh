@@ -228,7 +228,7 @@ if command -v nodenv 1>/dev/null 2>&1; then
     nodenv() {
         unset -f nodenv 1>/dev/null 2>&1
         eval "$(command nodenv init -)"
-        command nodenv "$@"
+        nodenv "$@"
     }
 else
     # Fallback to the original eager init if the shim directory isn't present.
