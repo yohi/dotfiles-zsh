@@ -4,15 +4,11 @@
 
 # Fig pre block. Keep at the top of this file.
 [[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.pre.zsh"
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n] confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
 
 # Determine dotfiles root directory (resolves symlinks)
 export DOTFILES_SHELL_ROOT="${${(%):-%N}:A:h:h}" # resolves to components/
 export ZSH_CONFIG_DIR="${DOTFILES_SHELL_ROOT}/dotfiles-zsh"
+
 
 # Load environment variables and secrets
 [[ -f "$ZSH_CONFIG_DIR/zsh_env" ]] && source "$ZSH_CONFIG_DIR/zsh_env"
@@ -46,11 +42,22 @@ mkdirdatetime() {
 
 # ls で ディレクトリに色を付ける
 autoload -Uz compinit
-# Fix insecure directories in $fpath
-if [[ -n "$(compaudit 2>/dev/null)" ]]; then
-    compaudit 2>/dev/null | xargs -r chmod g-w,o-w
+# Use cached completions unless the dump file is older than 24 hours or missing.
+# This avoids the ~25s full compinit rebuild on every shell startup.
+typeset -i compinit_cache_seconds=86400
+typeset zcompdump="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump-${ZSH_VERSION}"
+if [[ -e "$zcompdump" ]]; then
+    typeset -i dump_age
+    dump_age=$(($(date +%s) - $(date -r "$zcompdump" +%s 2>/dev/null || stat -c %Y "$zcompdump" 2>/dev/null)))
+    if (( dump_age < compinit_cache_seconds )); then
+        compinit -C -d "$zcompdump"
+    else
+        compinit -d "$zcompdump"
+    fi
+else
+    mkdir -p "${zcompdump:h}"
+    compinit -d "$zcompdump"
 fi
-compinit
 
 # DELETE KEY 有効化
 bindkey "^[[3~" delete-char
@@ -200,7 +207,6 @@ fi
 #         peco | awk '{print $1}')
 #     aws --profile ${profile} ssm start-session --target ${instance_id}
 # }
-# zle -N ec2-ssm
 
 
 # ブランチを簡単切り替え。git checkout lbで実行できる - DISABLED (peco dependency)
@@ -215,10 +221,20 @@ fi
 # Editor configuration (consolidated from multiple locations)
 unset LESSEDIT
 
-# nodenv initialization (ensure shims are prioritized in PATH)
+# Lazy nodenv initialization to avoid the ~2s startup cost of `nodenv init -`.
+# Only configures PATH/shims; `nodenv rehash` is run on first actual nodenv use.
 if command -v nodenv 1>/dev/null 2>&1; then
-  export PATH="$HOME/.nodenv/shims:${PATH}"
-  eval "$(nodenv init -)"
+    export PATH="$HOME/.nodenv/shims:${PATH}"
+    nodenv() {
+        unset -f nodenv 1>/dev/null 2>&1
+        eval "$(command nodenv init -)"
+        command nodenv "$@"
+    }
+else
+    # Fallback to the original eager init if the shim directory isn't present.
+    if [[ -d "$HOME/.nodenv/shims" ]]; then
+        export PATH="$HOME/.nodenv/shims:${PATH}"
+    fi
 fi
 
 # direnv hook
@@ -264,36 +280,26 @@ if [[ -f "$HOME/.local/share/zinit/zinit.git/zinit.zsh" ]]; then
     (( ${+_comps} )) && _comps[zinit]=_zinit
 fi
 
-# Load a few important annexes, without Turbo
-# (this is currently required for annexes)
-zinit light-mode for \
+# Load zinit annexes. Required for some zinit ice modifiers but not needed during
+# the initial prompt setup, so we defer them to reduce startup time.
+zinit wait lucid light-mode for \
     zdharma-continuum/zinit-annex-as-monitor \
     zdharma-continuum/zinit-annex-bin-gem-node \
     zdharma-continuum/zinit-annex-patch-dl \
     zdharma-continuum/zinit-annex-rust
 
-zinit light zdharma-continuum/fast-syntax-highlighting
-# zinit light zdharma/history-search-multi-word  # Disabled due to conflict with peco
-zinit light zsh-users/zsh-autosuggestions
-# zinit light junegunn/fzf-bin
+# Defer non-critical plugins to reduce startup time.
+# Syntax highlighting and autosuggestions work fine when loaded lazily.
+zinit wait lucid for \
+    zdharma-continuum/fast-syntax-highlighting \
+    zsh-users/zsh-autosuggestions
 
-# Load powerlevel10k theme
-
-zinit ice depth"1"
-zinit light romkatv/powerlevel10k
-
-# 残骸
-# # Load a few important annexes, without Turbo
-# # (this is currently required for annexes)
-# zinit ice from"gh-r" as"program"
-# zinit light-mode for \
-# zinit wait lucid atload"zicompinit; zicdreplay" blockf for zsh-users/zsh-completions
-
-
-### End of Zinit's installer chunk
-
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# Use Starship for a lightweight, cross-shell prompt.
+# Starship config: starship/starship.toml
+if command -v starship 1>/dev/null 2>&1; then
+    export STARSHIP_CONFIG="$ZSH_CONFIG_DIR/starship/starship.toml"
+    eval "$(starship init zsh)"
+fi
 
 
 alias kgnome='killall -3 gnome-shell'
@@ -318,7 +324,7 @@ fi
 
 if [[ -d "$ZSH_CONFIG_DIR/$functions_subdir" ]]; then
     # パフォーマンス最適化: glob結果を配列に格納してから処理
-    typeset -a func_files
+    typeset -ga func_files
     func_files=("$ZSH_CONFIG_DIR/$functions_subdir"/${~functions_pattern}(N))
 
     # サブディレクトリを含む全てのzshファイルを再帰的に読み込み
@@ -391,7 +397,7 @@ if [[ -n "$DOTFILES_SHELL_ROOT" ]]; then
     done
 
     # Use zsh globbing to find all _bin directories under components
-    for bin_dir in "$DOTFILES_SHELL_ROOT"/**/_bin(N/); do
+    for bin_dir in "$DOTFILES_SHELL_ROOT"/*/_bin(N/); do  # 各コンポーネント直下の_binのみ対象（1階層）
         export PATH="$bin_dir:$PATH"
     done
 fi

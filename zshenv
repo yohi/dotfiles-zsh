@@ -23,10 +23,14 @@ fi
 # Ensure standard system paths and subdirectories are present in fpath as fallback
 # Using zsh globbing to dynamically add all subdirectories under /usr/share/zsh/functions
 if [[ -d /usr/share/zsh/functions ]]; then
-    fpath=(
-        /usr/share/zsh/functions
-        /usr/share/zsh/functions/**/*(N/)
-        $fpath
-    )
+    # Add system zsh functions directories only if not already present
+    typeset -a new_fpath
+    new_fpath=(/usr/share/zsh/functions /usr/share/zsh/functions/**/*(N/))
+    for p in "${new_fpath[@]}"; do
+        [[ " ${fpath[*]} " == *" $p "* ]] && continue
+        fpath+=("$p")
+    done
+    # Remove duplicates to keep compinit fast
+    typeset -U fpath
 fi
 

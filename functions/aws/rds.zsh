@@ -24,9 +24,13 @@
 #   - fzf (fuzzy finder)
 #   - psql, mysql, sqlcmd (各DBクライアント)
 #   - aws/core.zsh (_aws_select_profile, _aws_select_ec2_instance)
-#   - aws/rds-helpers.zsh (全ヘルパー関数)
+#   - aws/rds-helpers.zsh (全ヘルパー関数; zshrc 読み込み時はスキップされ、ここで遅延読み込み)
 #
 # ===================================================================
+
+# rds-helpers.zsh は起動時間短縮のため zshrc 読み込み対象から外している。
+# rds-ssm 実行時にここで読み込む。
+[[ -f "${0:A:h}/rds-helpers.zsh" ]] && source "${0:A:h}/rds-helpers.zsh"
 
 # ===================================================================
 # RDS-SSM接続機能
