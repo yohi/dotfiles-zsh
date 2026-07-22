@@ -1,82 +1,91 @@
 # Starship 設定ファイル
-# tilix 対応の軽量設定
+# Powerlevel10k lean 風の表示を目指す
 
-# プロンプトの全体設定
+# 改行を抑制
+add_newline = false
+
+# プロンプトの全体設定（p10k lean 風：1 行 + 入力行）
 format = """
-$username\
-$hostname\
-$directory\
-$git_branch\
-$git_status\
-$nodejs\
-$python\
-$rust\
-$golang\
-$cmd_duration\
-$line_break\
+$os$directory$git_branch$git_status$cmd_duration$fill$username$hostname $time
 $character"""
 
-# ユーザー名表示
+# OS アイコン（p10k lean では白）
+[os]
+disabled = false
+style = "white"
+format = "[  ]($style)"
+
+# ディレクトリ表示（p10k の dir 相当：foreground 31）
+[directory]
+style = "cyan bold"
+truncation_length = 5
+truncate_to_repo = false
+format = "[  $path]($style)[$read_only](red) "
+read_only = ""
+home_symbol = "~"
+
+# Git ブランチ（p10k lean：clean では green）
+[git_branch]
+symbol = "   "
+style = "green bold"
+format = "[$symbol$branch]($style)"
+
+# Git ステータス（p10k lean：dirty では yellow）
+[git_status]
+style = "yellow bold"
+format = "([ $all_status$ahead_behind]($style)) "
+ahead = "⇡${count} "
+behind = "⇣${count} "
+diverged = "⇕ ⇡${ahead_count} ⇣${behind_count} "
+conflicted = "=${count} "
+untracked = "?${count} "
+stashed = "*${count} "
+modified = "!${count} "
+staged = "+${count} "
+renamed = "»${count} "
+deleted = "✘${count} "
+
+# コマンド実行時間（p10k lean：yellow/green）
+[cmd_duration]
+min_time = 2_000
+style = "yellow bold"
+format = "[ $duration]($style) "
+
+# 右寄せ用の fill
+[fill]
+symbol = " "
+
 [username]
-style_user = "cyan bold"
+style_user = "white bold"
 style_root = "red bold"
 format = "[$user]($style)"
 disabled = false
 show_always = true
 
-# ホスト名表示
 [hostname]
 ssh_only = false
-format = "@[$hostname](blue bold)"
+format = "[@$hostname](blue bold)"
 disabled = false
 
-# ディレクトリ表示
-[directory]
+[time]
+disabled = false
 style = "blue bold"
-truncation_length = 3
-truncate_to_repo = true
-
-# Git ブランチ
-[git_branch]
-symbol = "🌱 "
-style = "green bold"
-
-# Git ステータス
-[git_status]
-style = "red bold"
-ahead = "⇡${count}"
-diverged = "⇕⇡${ahead_count}⇣${behind_count}"
-behind = "⇣${count}"
-
-# Node.js
-[nodejs]
-symbol = "⬢ "
-style = "green bold"
-
-# Python
-[python]
-symbol = "🐍 "
-style = "yellow bold"
-
-# Rust
-[rust]
-symbol = "🦀 "
-style = "red bold"
-
-# Go
-[golang]
-symbol = "🐹 "
-style = "cyan bold"
-
-# コマンド実行時間
-[cmd_duration]
-min_time = 2_000
-style = "yellow bold"
-format = "took [$duration]($style)"
+format = "[  $time]($style)"
+time_format = "%H:%M:%S"
 
 # プロンプト文字
 [character]
 success_symbol = "[❯](green bold)"
 error_symbol = "[❯](red bold)"
 
+[nodejs]
+disabled = true
 
+[python]
+disabled = true
+
+[rust]
+disabled = true
+
+[golang]
+disabled = true
