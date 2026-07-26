@@ -436,15 +436,20 @@ if [ -f "$HOME/dotfiles/components/dotfiles-ai/.env" ]; then set -a; . "$HOME/do
 export PATH="$HOME/.local/bin:$PATH"
 # GitHub CLIを用いたGITHUB_TOKENの同期・非同期ハイブリッド取得
 if command -v gh >/dev/null 2>&1; then
-  # キャッシュファイルが無い場合のみ同期的に取得。存在する場合はバックグラウンドで非同期更新し、シェル起動をブロックしない
+  # キャッシュファイルが無い場合のみ同期取得。
+  # 既存キャッシュがある場合はバックグラウンド更新しつつ、バックグラウンド更新完了時に更新後のファイルから再取得
   if [[ ! -s "$HOME/.gh_token" ]]; then
     (umask 077; gh auth token >| "$HOME/.gh_token.tmp" 2>/dev/null && mv "$HOME/.gh_token.tmp" "$HOME/.gh_token" 2>/dev/null && chmod 600 "$HOME/.gh_token" 2>/dev/null)
+    [ -s "$HOME/.gh_token" ] && export GITHUB_TOKEN=$(cat "$HOME/.gh_token")
   else
-    (umask 077; gh auth token >| "$HOME/.gh_token.tmp" 2>/dev/null && mv "$HOME/.gh_token.tmp" "$HOME/.gh_token" 2>/dev/null && chmod 600 "$HOME/.gh_token" 2>/dev/null &)
-  fi
-
-  if [ -s "$HOME/.gh_token" ]; then
     export GITHUB_TOKEN=$(cat "$HOME/.gh_token")
+    (
+      umask 077
+      if gh auth token >| "$HOME/.gh_token.tmp" 2>/dev/null; then
+        mv "$HOME/.gh_token.tmp" "$HOME/.gh_token" 2>/dev/null
+        chmod 600 "$HOME/.gh_token" 2>/dev/null
+      fi
+    ) &
   fi
 fi
 
