@@ -436,18 +436,35 @@ if [ -f "$HOME/dotfiles/components/dotfiles-ai/.env" ]; then set -a; . "$HOME/do
 export PATH="$HOME/.local/bin:$PATH"
 # GitHub CLIを用いたGITHUB_TOKENの同期・非同期ハイブリッド取得
 if command -v gh >/dev/null 2>&1; then
-  # キャッシュファイルが無い、または1時間(60分)以上古い場合は同期的に取得
-  if [[ ! -s "$HOME/.gh_token" ]] || [[ -n "$(find "$HOME/.gh_token" -mmin +60 2>/dev/null)" ]]; then
-    (umask 077; gh auth token >| "$HOME/.gh_token.tmp" 2>/dev/null && mv "$HOME/.gh_token.tmp" "$HOME/.gh_token" 2>/dev/null && chmod 600 "$HOME/.gh_token" 2>/dev/null)
+  # キャッシュファイルが無い場合のみ同期取得。
+  # 既存キャッシュがある場合は即座に読み込み、一定時間（1時間）以上経過していればバックグラウンドで更新（次回起動時に反映）
+  if [[ ! -s "$HOME/.gh_token" ]]; then
+    tmp_file=$(mktemp "$HOME/.gh_token.tmp.XXXXXX" 2>/dev/null || mktemp)
+    if (umask 077 && gh auth token >| "$tmp_file" 2>/dev/null); then
+      chmod 600 "$tmp_file" 2>/dev/null
+      mv "$tmp_file" "$HOME/.gh_token" 2>/dev/null
+    else
+      rm -f "$tmp_file" 2>/dev/null
+    fi
+    [ -s "$HOME/.gh_token" ] && export GITHUB_TOKEN=$(cat "$HOME/.gh_token")
   else
-    # それ以外はバックグラウンドで更新して次回の起動に備える
-    (umask 077; gh auth token >| "$HOME/.gh_token.tmp" 2>/dev/null && mv "$HOME/.gh_token.tmp" "$HOME/.gh_token" 2>/dev/null && chmod 600 "$HOME/.gh_token" 2>/dev/null &)
-  fi
-
-  if [ -s "$HOME/.gh_token" ]; then
     export GITHUB_TOKEN=$(cat "$HOME/.gh_token")
+    # キャッシュが1時間（3600秒）以上古い場合のみバックグラウンドで更新
+    if [[ -n $(find "$HOME/.gh_token" -mmin +60 2>/dev/null) ]]; then
+      (
+        tmp_file=$(mktemp "$HOME/.gh_token.tmp.XXXXXX" 2>/dev/null || mktemp)
+        if (umask 077 && gh auth token >| "$tmp_file" 2>/dev/null); then
+          chmod 600 "$tmp_file" 2>/dev/null
+          mv "$tmp_file" "$HOME/.gh_token" 2>/dev/null
+        else
+          rm -f "$tmp_file" 2>/dev/null
+        fi
+      ) &
+    fi
   fi
 fi
 
+
 # Load AWS functions entry point explicitly after generic loader
 [[ -f "$ZSH_CONFIG_DIR/functions/aws.zsh" ]] && source "$ZSH_CONFIG_DIR/functions/aws.zsh"
+
