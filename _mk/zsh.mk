@@ -23,6 +23,17 @@ setup-zsh: ## Zsh の設定適用 (シンボリックリンク作成)
 	$(call SAFE_LN,$(ZSH_DIR)/prompts/p10.zsh,$(HOME)/.p10k.zsh)
 	@$(MAKE) .setup-zsh-secrets-impl
 	@$(MAKE) .setup-gh-auth
+	@$(MAKE) .check-default-shell
+
+.PHONY: .check-default-shell
+.check-default-shell:
+	@if [ "$$SHELL" != "$$(which zsh 2>/dev/null)" ]; then \
+		echo "  ⚠️  現在のデフォルトシェルは $$SHELL です。zsh に変更する場合は以下を実行してください:"; \
+		echo "    chsh -s $$(which zsh)"; \
+	else \
+		echo "  ✅ Zsh がデフォルトシェルに設定されています。"; \
+	fi
+
 
 .PHONY: .setup-gh-auth
 .setup-gh-auth:
