@@ -27,12 +27,20 @@ setup-zsh: ## Zsh の設定適用 (シンボリックリンク作成)
 
 .PHONY: .check-default-shell
 .check-default-shell:
-	@if [ "$$SHELL" != "$$(which zsh 2>/dev/null)" ]; then \
-		echo "  ⚠️  現在のデフォルトシェルは $$SHELL です。zsh に変更する場合は以下を実行してください:"; \
-		echo "    chsh -s $$(which zsh)"; \
-	else \
-		echo "  ✅ Zsh がデフォルトシェルに設定されています。"; \
+	@ZSH_PATH="$$(which zsh 2>/dev/null)"; \
+	if [ -n "$$ZSH_PATH" ]; then \
+		if ! grep -qxF "$$ZSH_PATH" /etc/shells 2>/dev/null; then \
+			echo "  ⚠️  $$ZSH_PATH が /etc/shells に登録されていません。登録を試みます..."; \
+			echo "$$ZSH_PATH" | sudo tee -a /etc/shells >/dev/null || echo "  ❌ /etc/shells への登録に失敗しました。手動で 'echo $$ZSH_PATH | sudo tee -a /etc/shells' を実行してください。"; \
+		fi; \
+		if [ "$$SHELL" != "$$ZSH_PATH" ]; then \
+			echo "  ⚠️  現在のデフォルトシェルは $$SHELL です。zsh に変更する場合は以下を実行してください:"; \
+			echo "    chsh -s $$ZSH_PATH"; \
+		else \
+			echo "  ✅ Zsh がデフォルトシェルに設定されています。"; \
+		fi; \
 	fi
+
 
 
 .PHONY: .setup-gh-auth
