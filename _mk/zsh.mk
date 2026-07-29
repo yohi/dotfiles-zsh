@@ -23,6 +23,51 @@ setup-zsh: ## Zsh の設定適用 (シンボリックリンク作成)
 	$(call SAFE_LN,$(ZSH_DIR)/prompts/p10.zsh,$(HOME)/.p10k.zsh)
 	@$(MAKE) .setup-zsh-secrets-impl
 	@$(MAKE) .setup-gh-auth
+	@$(MAKE) .check-default-shell
+
+.PHONY: .check-default-shell
+.check-default-shell:
+	@ZSH_PATH="$$(which zsh 2>/dev/null)"; \
+	if [ -n "$$ZSH_PATH" ]; then \
+		REAL_ZSH_PATH="$$(readlink -f "$$ZSH_PATH" 2>/dev/null || realpath "$$ZSH_PATH" 2>/dev/null || echo "$$ZSH_PATH")"; \
+		case "$$REAL_ZSH_PATH" in \
+			/bin/*|/usr/bin/*|/usr/local/bin/*|/opt/homebrew/*|/home/linuxbrew/.linuxbrew/*) ;; \
+			*) \
+				if ! grep -qxF "$$REAL_ZSH_PATH" /etc/shells 2>/dev/null; then \
+					echo "  ⚠️  $$REAL_ZSH_PATH は標準のパス外かつ /etc/shells に未登録のためスキップします。"; \
+					exit 0; \
+				fi; \
+				;; \
+		esac; \
+		if ! grep -qxF "$$REAL_ZSH_PATH" /etc/shells 2>/dev/null; then \
+			if [ -t 0 ] && [ -z "$$CI" ]; then \
+				echo "  ⚠️  $$REAL_ZSH_PATH が /etc/shells に登録されていません。登録を試みます..."; \
+				echo "$$REAL_ZSH_PATH" | sudo tee -a /etc/shells >/dev/null || { echo "  ❌ /etc/shells への登録に失敗しました。"; exit 1; }; \
+			else \
+				echo "  ⚠️  非対話環境のため /etc/shells への登録をスキップします。"; \
+			fi; \
+		fi; \
+		USER_NAME="$${USER:-$$(id -un)}"; \
+		CURRENT_SHELL=""; \
+		if command -v getent >/dev/null 2>&1; then \
+			CURRENT_SHELL="$$(getent passwd "$$USER_NAME" | cut -d: -f7)"; \
+		elif command -v dscl >/dev/null 2>&1; then \
+			CURRENT_SHELL="$$(dscl . -read "/Users/$$USER_NAME" UserShell 2>/dev/null | awk '{print $$2}')"; \
+		fi; \
+		if [ -z "$$CURRENT_SHELL" ]; then \
+			CURRENT_SHELL="$$SHELL"; \
+		fi; \
+		if [ "$$CURRENT_SHELL" != "$$REAL_ZSH_PATH" ]; then \
+			if [ -t 0 ] && [ -z "$$CI" ]; then \
+				echo "  🔄 デフォルトシェルを $$REAL_ZSH_PATH に変更します..."; \
+				chsh -s "$$REAL_ZSH_PATH" || { echo "  ❌ chsh の実行に失敗しました。"; exit 1; }; \
+			else \
+				echo "  ⚠️  非対話環境のため デフォルトシェルの変更 (chsh) をスキップします。"; \
+			fi; \
+		else \
+			echo "  ✅ Zsh がデフォルトシェルに設定されています。"; \
+		fi; \
+	fi
 
 .PHONY: .setup-gh-auth
 .setup-gh-auth:
