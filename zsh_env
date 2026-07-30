@@ -13,12 +13,16 @@ export IBUS_USE_PORTAL=1
 export IBUS_ENABLE_SYNC_MODE=1
 
 # Path additions (General)
-export PATH="/home/${USER}/bin:${PATH}"
+export PATH="${HOME}/bin:${PATH}"
 export PATH="${PATH}:/sbin"
 
 # ROOTLESS DOCKER
-if [[ -z "${DOCKER_HOST:-}" && -n "${XDG_RUNTIME_DIR:-}" && -S "${XDG_RUNTIME_DIR}/docker.sock" ]]; then
-    export DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/docker.sock"
+if [[ -z "${DOCKER_HOST:-}" ]]; then
+    if [[ -n "${XDG_RUNTIME_DIR:-}" && -S "${XDG_RUNTIME_DIR}/docker.sock" ]]; then
+        export DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/docker.sock"
+    elif [[ -n "${UID:-}" && -S "/run/user/${UID}/docker.sock" ]]; then
+        export DOCKER_HOST="unix:///run/user/${UID}/docker.sock"
+    fi
 fi
 
 # DOCKER BUILDKIT
