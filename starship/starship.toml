@@ -56,7 +56,7 @@ format = "[ $duration]($style) "
 symbol = " "
 
 [username]
-style_user = "white bold"
+style_user = "green bold"
 style_root = "red bold"
 format = "[$user]($style)"
 disabled = false
@@ -64,13 +64,14 @@ show_always = true
 
 [hostname]
 ssh_only = false
-format = "[@$hostname](blue bold)"
+style = "blue bold"
+format = "[@](dimmed white)[$hostname]($style)"
 disabled = false
 
 [time]
 disabled = false
-style = "blue bold"
-format = "[  $time]($style)"
+style = "yellow bold"
+format = "[ $time]($style)"
 time_format = "%H:%M:%S"
 
 # プロンプト文字
