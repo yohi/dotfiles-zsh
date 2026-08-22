@@ -127,8 +127,6 @@ setopt inc_append_history
 # 開始と終了を記録
 setopt EXTENDED_HISTORY
 
-# 起動時に HISTFILE から履歴をメモリに読み込む
-[[ -f "$HISTFILE" ]] && fc -R "$HISTFILE" 2>/dev/null || true
 
 # 🔒 CursorIDE/Claude Code 履歴無効化設定
 # CursorIDEやClaude Codeでのコマンド履歴を無効化してプライバシーを保護
@@ -264,11 +262,11 @@ export PATH="/home/linuxbrew/.linuxbrew/opt/python@3.11/libexec/bin:$PATH"
 #
 # alias nvim=nvimvenv
 
-# fzf 2枠完全分離デザイン（上部：入力専用枠 / 下部：履歴リスト専用枠）
-export FZF_DEFAULT_OPTS='--height 80% --min-height 20 --layout=reverse --border=none --margin=2,5 --padding=0 --input-border=rounded --input-label=" 🔍 Search " --input-label-pos=3 --list-border=rounded --list-label=" 🕒 Command History " --list-label-pos=3 --color=bg+:#24283b,bg:#1a1b26,spinner:#9ece6a,hl:#bb9af7 --color=fg:#c0caf5,header:#9ece6a,info:#7aa2f7,pointer:#7dcfff --color=marker:#9ece6a,fg+:#c0caf5,prompt:#7dcfff,hl+:#7dcfff --color=border:#7aa2f7,label:#7dcfff --prompt="❯ " --pointer="▶ " --marker="✓ "'
+# fzf 2枠完全分離デザイン（上部：入力専用枠 / 下部：リスト専用枠）
+export FZF_DEFAULT_OPTS='--height 80% --min-height 20 --layout=reverse --border=none --margin=2,5 --padding=0 --input-border=rounded --input-label=" 🔍 Search " --input-label-pos=3 --list-border=rounded --color=bg+:#24283b,bg:#1a1b26,spinner:#9ece6a,hl:#bb9af7 --color=fg:#c0caf5,header:#9ece6a,info:#7aa2f7,pointer:#7dcfff --color=marker:#9ece6a,fg+:#c0caf5,prompt:#7dcfff,hl+:#7dcfff --color=border:#7aa2f7,label:#7dcfff --prompt="❯ " --pointer="▶ " --marker="✓ "'
 
-# Ctrl+R 専用設定: リスト領域にそのまま履歴を表示
-export FZF_CTRL_R_OPTS=''
+# Ctrl+R 専用設定: コマンド履歴用ラベルを設定
+export FZF_CTRL_R_OPTS='--list-label=" 🕒 Command History " --list-label-pos=3'
 
 # fzf 統合（Ctrl+R キーバインドと補完）
 if command -v fzf >/dev/null 2>&1; then
