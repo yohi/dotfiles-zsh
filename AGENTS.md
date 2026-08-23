@@ -34,7 +34,7 @@ dotfiles-zsh/
 ├── zsh_secrets.example         # Secrets template (Copy to .zsh_secrets)
 ├── .zsh_secrets                # [Local Only] Actual secrets (Git ignored)
 ├── config/                     # Internal config / templates
-├── functions/                  # Zsh function library (sourced by zshrc)
+├── zsh-functions/              # Zsh function library (sourced by zshrc)
 │   └── aws/                    # AWS CLI helper functions
 ├── prompts/                    # Prompt themes (p10k)
 └── starship/                   # Starship prompt configuration
@@ -42,8 +42,8 @@ dotfiles-zsh/
 
 ## THIS COMPONENT — SPECIAL NOTES
 
-- `zshrc` dynamically adds `_bin/` directories of sibling components to `$PATH` (loose coupling).
-- `functions/` are sourced by `zshrc`, NOT symlinked.
+- `zshrc` dynamically adds `_bin/` and `zsh-functions/` directories of sibling components (`components/dotfiles-*/`) to `$PATH` and `$fpath` / lazy-loading stubs (loose coupling).
+- `zsh-functions/` are managed per-component and lazy-loaded or sourced dynamically by `zshrc`.
 - `config/config.zsh` contains component-internal configuration (not linked).
 - `starship/starship.toml` is referenced via a separate mechanism, not directly linked.
 - Symlinks are managed explicitly via `ln -sfn` in the Makefile (`make setup` / `make setup-zsh`).
